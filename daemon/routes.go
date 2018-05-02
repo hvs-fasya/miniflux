@@ -144,5 +144,7 @@ func routes(cfg *config.Config, store *storage.Storage, feedHandler *feed.Handle
 	uiRouter.HandleFunc("/logout", uiController.Logout).Name("logout").Methods("GET")
 	uiRouter.HandleFunc("/", uiController.ShowLoginPage).Name("login").Methods("GET")
 
+	uiRouter.HandleFunc("/filters", uiController.ShowFeedFilters).Name("filters").Methods("GET")
+
 	return router
 }

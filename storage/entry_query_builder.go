@@ -33,6 +33,7 @@ type EntryQueryBuilder struct {
 	entryIDs           []int64
 	before             *time.Time
 	starred            bool
+	filter 				string
 }
 
 // WithStarred adds starred filter.
@@ -110,6 +111,12 @@ func (e *EntryQueryBuilder) WithLimit(limit int) *EntryQueryBuilder {
 // WithOffset set the offset.
 func (e *EntryQueryBuilder) WithOffset(offset int) *EntryQueryBuilder {
 	e.offset = offset
+	return e
+}
+
+// WithFilter adds content text filter.
+func (e *EntryQueryBuilder) WithFilter(filter string) *EntryQueryBuilder {
+	e.filter = filter
 	return e
 }
 
@@ -254,7 +261,7 @@ func (e *EntryQueryBuilder) GetEntryIDs() ([]int64, error) {
 
 	args, conditions := e.buildCondition()
 	query = fmt.Sprintf(query, conditions, e.buildSorting())
-	// log.Println(query)
+	fmt.Println(query)
 
 	rows, err := e.store.db.Query(query, args...)
 	if err != nil {
@@ -323,6 +330,11 @@ func (e *EntryQueryBuilder) buildCondition() ([]interface{}, string) {
 
 	if e.starred {
 		conditions = append(conditions, "e.starred is true")
+	}
+
+	if e.filter != "" {
+		conditions = append(conditions, fmt.Sprintf("e.content like '%'$%d'%'", len(args)+1))
+		args = append(args, e.notStatus)
 	}
 
 	return args, strings.Join(conditions, " AND ")

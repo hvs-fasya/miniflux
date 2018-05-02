@@ -57,6 +57,9 @@
                 <li {{ if eq .menu "categories" }}class="active"{{ end }} title="{{ t "Keyboard Shortcut: %s" "g c" }}">
                     <a href="{{ route "categories" }}" data-page="categories">{{ t "Categories" }}</a>
                 </li>
+                <li {{ if eq .menu "filters" }}class="active"{{ end }} title="{{ t "Keyboard Shortcut: %s" "g f s" }}">
+                    <a href="{{ route "filters" }}" data-page="filters">{{ t "Filters" }}</a>
+                </li>
                 <li {{ if eq .menu "settings" }}class="active"{{ end }} title="{{ t "Keyboard Shortcut: %s" "g s" }}">
                     <a href="{{ route "settings" }}" data-page="settings">{{ t "Settings" }}</a>
                 </li>
@@ -89,6 +92,7 @@
                     <li>{{ t "Go to history" }} = <strong>g + h</strong></li>
                     <li>{{ t "Go to feeds" }} = <strong>g + f</strong></li>
                     <li>{{ t "Go to categories" }} = <strong>g + c</strong></li>
+                    <li>{{ t "Go to filters" }} = <strong>g + f + s</strong></li>
                     <li>{{ t "Go to settings" }} = <strong>g + s</strong></li>
                     <li>{{ t "Show keyboard shortcuts" }} = <strong>?</strong></li>
                 </ul>
