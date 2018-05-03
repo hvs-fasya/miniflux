@@ -52,6 +52,7 @@ func (c *Controller) ShowFeedFilters(w http.ResponseWriter, r *http.Request) {
 	builder.WithDirection(user.EntryDirection)
 	builder.WithOffset(offset)
 	builder.WithLimit(nbItemsPerPage)
+	builder.WithFilter(filter)
 
 	entries, err := builder.GetEntries()
 	if err != nil {
