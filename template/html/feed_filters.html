@@ -1,20 +1,46 @@
 {{ define "title"}}{{ .feed.Title }} ({{ .total }}){{ end }}
 
 {{ define "content"}}
-<form action="{{ route "filters" }}" method="get" autocomplete="off">
+
+<a href="#" title="Remove" id="chip-template" hidden class="category" data-on-click="rmFromFilter">
+    <input disabled type="hidden" name="filters[]">
+    <span title="remove" data-on-click="rmFromFilter"> &#10006;</span>
+</a>
+
+<form action="{{ route "filters" }}" method="post" autocomplete="off">
     <input type="hidden" name="csrf" value="{{ .csrf }}">
 
 {{ if .errorMessage }}
     <div class="alert alert-error">{{ t .errorMessage }}</div>
 {{ end }}
 
-    <label for="filter">{{ t "Set filter" }}</label>
-    <input type="text" name="filter" id="filter" value="{{ t .filter }}" required autofocus>
+    <label for="filter">{{ t "New filter" }}</label>
+    <input type="text" name="keyword" id="keyword" value="" placeholder="keyword" autofocus>
+    <button class="button button-info" data-on-click="addToFilter">{{ t "Add keyword" }}</button>
+
+    <div id="chips" >
+
+    </div>
 
     <div class="buttons">
-        <button type="submit" class="button button-primary" data-label-loading="{{ t "Loading..." }}">{{ t "Find" }}</button>
+        <button type="submit" class="button button-primary" data-label-loading="{{ t "Loading..." }}">{{ t "Create" }}</button>
     </div>
 </form>
+
+{{/*<form action="{{ route "filters" }}" method="get" autocomplete="off">*/}}
+    {{/*<input type="hidden" name="csrf" value="{{ .csrf }}">*/}}
+
+{{/*{{ if .errorMessage }}*/}}
+    {{/*<div class="alert alert-error">{{ t .errorMessage }}</div>*/}}
+{{/*{{ end }}*/}}
+
+    {{/*<label for="filter">{{ t "Set filter" }}</label>*/}}
+    {{/*<input type="text" name="filter" id="filter" value="{{ t .filter }}" required autofocus>*/}}
+
+    {{/*<div class="buttons">*/}}
+        {{/*<button type="submit" class="button button-primary" data-label-loading="{{ t "Loading..." }}">{{ t "Find" }}</button>*/}}
+    {{/*</div>*/}}
+{{/*</form>*/}}
 
 {{/*<section class="page-header">*/}}
     {{/*<h1>{{ .feed.Title }} ({{ .total }})</h1>*/}}

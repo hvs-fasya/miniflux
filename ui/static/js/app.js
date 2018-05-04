@@ -35,16 +35,6 @@ class DomHelper {
 
         return result;
     }
-
-    static findParent(element, selector) {
-        for (; element && element !== document; element = element.parentNode) {
-            if (element.classList.contains(selector)) {
-                return element;
-            }
-        }
-
-        return null;
-    }
 }
 
 class TouchHandler {
@@ -732,6 +722,27 @@ class NavHandler {
     }
 }
 
+class FiltersHandler {
+
+    static addToFilter(word) {
+        let chips = document.querySelector("#chips");
+        let template = document.querySelector("#chip-template");
+        let chip = template.cloneNode(true);
+        chip.id = "chip" + chips.childElementCount;
+        chip.hidden = 0;
+        chip.childNodes[1].value = word;
+        let x = chip.childNodes[3].textContent;
+        chip.childNodes[3].textContent = word + x;
+        chips.appendChild(chip);
+    }
+
+    static rmFromFilter(chip) {
+        let chips = document.querySelector("#chips");
+        let oldChip = chips.removeChild(chip);
+        console.log(oldChip);
+    }
+}
+
 document.addEventListener("DOMContentLoaded", function() {
     FormHandler.handleSubmitButtons();
 
@@ -793,6 +804,24 @@ document.addEventListener("DOMContentLoaded", function() {
     mouseHandler.onClick("a[data-on-click=markPageAsRead]", () => navHandler.markPageAsRead());
     mouseHandler.onClick("a[data-confirm]", (event) => {
         (new ConfirmHandler()).handle(event);
+    });
+
+    mouseHandler.onClick("button[data-on-click=addToFilter]", (event) => {
+        event.preventDefault();
+        let inputs = document.querySelectorAll("#keyword");
+        if (inputs && inputs.length > 0) {
+            let newWord = inputs[0].value;
+            FiltersHandler.addToFilter(newWord);
+            inputs[0].value = "";
+            inputs[0].focus();
+        }
+    });
+
+    mouseHandler.onClick("span[data-on-click=rmFromFilter]", (event) => {
+        event.stopPropagation();
+        console.log("clicked");
+        console.log(event.target.parentNode);
+        FiltersHandler.rmFromFilter(event.target.parentNode);
     });
 
     if (document.documentElement.clientWidth < 600) {
