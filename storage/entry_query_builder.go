@@ -33,7 +33,7 @@ type EntryQueryBuilder struct {
 	entryIDs           []int64
 	before             *time.Time
 	starred            bool
-	filter 			   string
+	filter             string
 }
 
 // WithStarred adds starred filter.
@@ -115,8 +115,8 @@ func (e *EntryQueryBuilder) WithOffset(offset int) *EntryQueryBuilder {
 }
 
 // WithFilter adds content text filter.
-func (e *EntryQueryBuilder) WithFilter(filter string) *EntryQueryBuilder {
-	e.filter = filter
+func (e *EntryQueryBuilder) WithFilter(filter []string) *EntryQueryBuilder {
+	e.filter = strings.Join(filter, "|")
 	return e
 }
 
@@ -180,7 +180,6 @@ func (e *EntryQueryBuilder) GetEntries() (model.Entries, error) {
 
 	args, conditions := e.buildCondition()
 	query = fmt.Sprintf(query, conditions, e.buildSorting())
-	// log.Println(query)
 
 	rows, err := e.store.db.Query(query, args...)
 	if err != nil {
@@ -332,7 +331,7 @@ func (e *EntryQueryBuilder) buildCondition() ([]interface{}, string) {
 	}
 
 	if e.filter != "" {
-		conditions = append(conditions, fmt.Sprintf("e.content like '%%' || $%d || '%%'", len(args)+1))
+		conditions = append(conditions, fmt.Sprintf("(e.content SIMILAR TO '%%(' || $%d || ')%%' OR e.title SIMILAR TO '%%(' || $%d || ')%%')", len(args)+1, len(args)+1))
 		args = append(args, e.filter)
 	}
 

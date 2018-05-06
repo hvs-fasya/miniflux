@@ -1,10 +1,10 @@
-{{ define "title"}}{{ .feed.Title }} ({{ .total }}){{ end }}
+{{ define "title"}}Filters - test{{ end }}
 
 {{ define "content"}}
 
-<a href="#" title="Remove" id="chip-template" hidden class="category" data-on-click="rmFromFilter">
+<a href="#" role="button" title="Remove" id="chip-template" hidden class="category">
     <input disabled type="hidden" name="filters[]">
-    <span title="remove" data-on-click="rmFromFilter"> &#10006;</span>
+    <span title="remove"> &#10006;</span>
 </a>
 
 <form action="{{ route "filters" }}" method="post" autocomplete="off">
@@ -14,11 +14,12 @@
     <div class="alert alert-error">{{ t .errorMessage }}</div>
 {{ end }}
 
-    <label for="filter">{{ t "New filter" }}</label>
+    <label>{{ t "New filter" }}</label>
+    <input type="text" name="filter_name" id="filter_name" value="" placeholder="set filter name" required autofocus><br>
     <input type="text" name="keyword" id="keyword" value="" placeholder="keyword" autofocus>
     <button class="button button-info" data-on-click="addToFilter">{{ t "Add keyword" }}</button>
 
-    <div id="chips" >
+    <div id="chips" data-on-click="rmFromFilter">
 
     </div>
 
@@ -27,63 +28,50 @@
     </div>
 </form>
 
-{{/*<form action="{{ route "filters" }}" method="get" autocomplete="off">*/}}
-    {{/*<input type="hidden" name="csrf" value="{{ .csrf }}">*/}}
+<section class="page-header">
+{{ if not .current }}
+    <p class="alert">{{ t "There is no filters created." }}</p>
+{{else}}
+    <h3>Saved filters:</h3>
+    <ul class="items">
+    {{ range .filters }}
+        <li><a href="/filters/{{ .ID }}"><b>{{ .FilterName }}: </b>
+        {{ range .Filters}}
+            <span><i>{{ . }}</i></span>
+        {{ end }}
+        </a></li><br>
+    {{ end}}
 
-{{/*{{ if .errorMessage }}*/}}
-    {{/*<div class="alert alert-error">{{ t .errorMessage }}</div>*/}}
-{{/*{{ end }}*/}}
+    </ul>
+    <h3>Current filter: {{ .current.FilterName }}</h3>
+    <div class="items">
+        {{ range .current.Filters }}
+            <span><i>{{ . }}</i></span>
+        {{ end}}
 
-    {{/*<label for="filter">{{ t "Set filter" }}</label>*/}}
-    {{/*<input type="text" name="filter" id="filter" value="{{ t .filter }}" required autofocus>*/}}
-
-    {{/*<div class="buttons">*/}}
-        {{/*<button type="submit" class="button button-primary" data-label-loading="{{ t "Loading..." }}">{{ t "Find" }}</button>*/}}
-    {{/*</div>*/}}
-{{/*</form>*/}}
-
-{{/*<section class="page-header">*/}}
-    {{/*<h1>{{ .feed.Title }} ({{ .total }})</h1>*/}}
-    {{/*<ul>*/}}
-        {{/*<li>*/}}
-            {{/*<a href="{{ route "refreshFeed" "feedID" .feed.ID }}">{{ t "Refresh" }}</a>*/}}
-        {{/*</li>*/}}
-        {{/*<li>*/}}
-            {{/*<a href="{{ route "editFeed" "feedID" .feed.ID }}">{{ t "Edit" }}</a>*/}}
-        {{/*</li>*/}}
-    {{/*{{ if .entries }}*/}}
-        {{/*<li>*/}}
-            {{/*<a href="#" data-on-click="markPageAsRead">{{ t "Mark this page as read" }}</a>*/}}
-        {{/*</li>*/}}
-    {{/*{{ end }}*/}}
-    {{/*</ul>*/}}
-{{/*</section>*/}}
-
-{{/*{{ if ne .feed.ParsingErrorCount 0 }}*/}}
-{{/*<div class="alert alert-error">*/}}
-    {{/*<h3>{{ t "There is a problem with this feed" }}</h3>*/}}
-    {{/*<p>{{ t .feed.ParsingErrorMsg }}</p>*/}}
-{{/*</div>*/}}
-{{/*{{ else if not .entries }}*/}}
-{{/*<p class="alert">{{ t "There is no article for this feed." }}</p>*/}}
-{{/*{{ else }}*/}}
-<div class="items">
-{{ range .entries }}
-    <article class="item touch-item item-status-{{ .Status }}" data-id="{{ .ID }}">
-        <div class="item-header">
-                <span class="item-title">
-                    {{ if ne .Feed.Icon.IconID 0 }}
-                        <img src="{{ route "icon" "iconID" .Feed.Icon.IconID }}" width="16" height="16">
-                    {{ end }}
-                        <a href="{{ route "feedEntry" "feedID" .Feed.ID "entryID" .ID }}">{{ .Title }}</a>
-                </span>
-            <span class="category"><a href="{{ route "categoryEntries" "categoryID" .Feed.Category.ID }}">{{ .Feed.Category.Title }}</a></span>
-        </div>
-    {{ template "item_meta" dict "user" $.user "entry" . "hasSaveEntry" $.hasSaveEntry }}
-    </article>
+    </div>
 {{ end }}
-</div>
+</section>
+
+{{ if not .entries }}
+    <p class="alert">{{ t "There is no article for this filter." }}</p>
+{{ else }}
+    <div class="items">
+    {{ range .entries }}
+        <article class="item touch-item item-status-{{ .Status }}" data-id="{{ .ID }}">
+            <div class="item-header">
+                    <span class="item-title">
+                        {{ if ne .Feed.Icon.IconID 0 }}
+                            <img src="{{ route "icon" "iconID" .Feed.Icon.IconID }}" width="16" height="16">
+                        {{ end }}
+                            <a href="{{ route "feedEntry" "feedID" .Feed.ID "entryID" .ID }}">{{ .Title }}</a>
+                    </span>
+                <span class="category"><a href="{{ route "categoryEntries" "categoryID" .Feed.Category.ID }}">{{ .Feed.Category.Title }}</a></span>
+            </div>
+        {{/*{{ template "item_meta" dict "user" $.user "entry" . "hasSaveEntry" $.hasSaveEntry }}*/}}
+        </article>
+    {{ end }}
+    </div>
+{{ end }}
 {{/*{{ template "pagination" .pagination }}*/}}
 {{ end }}
-
-{{/*{{ end }}*/}}

@@ -731,6 +731,7 @@ class FiltersHandler {
         chip.id = "chip" + chips.childElementCount;
         chip.hidden = 0;
         chip.childNodes[1].value = word;
+        chip.childNodes[1].disabled = false;
         let x = chip.childNodes[3].textContent;
         chip.childNodes[3].textContent = word + x;
         chips.appendChild(chip);
@@ -739,7 +740,6 @@ class FiltersHandler {
     static rmFromFilter(chip) {
         let chips = document.querySelector("#chips");
         let oldChip = chips.removeChild(chip);
-        console.log(oldChip);
     }
 }
 
@@ -817,10 +817,8 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
-    mouseHandler.onClick("span[data-on-click=rmFromFilter]", (event) => {
+    mouseHandler.onClick("div[data-on-click=rmFromFilter]", (event) => {
         event.stopPropagation();
-        console.log("clicked");
-        console.log(event.target.parentNode);
         FiltersHandler.rmFromFilter(event.target.parentNode);
     });
 
