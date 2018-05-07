@@ -34,6 +34,7 @@ type EntryQueryBuilder struct {
 	before             *time.Time
 	starred            bool
 	filter             string
+	after             *time.Time
 }
 
 // WithStarred adds starred filter.
@@ -45,6 +46,12 @@ func (e *EntryQueryBuilder) WithStarred() *EntryQueryBuilder {
 // Before add condition base on the entry date.
 func (e *EntryQueryBuilder) Before(date *time.Time) *EntryQueryBuilder {
 	e.before = date
+	return e
+}
+
+// After add condition base on the entry date.
+func (e *EntryQueryBuilder) After(date *time.Time) *EntryQueryBuilder {
+	e.after = date
 	return e
 }
 
@@ -247,8 +254,8 @@ func (e *EntryQueryBuilder) GetEntries() (model.Entries, error) {
 
 // GetEntryIDs returns a list of entry IDs that match the condition.
 func (e *EntryQueryBuilder) GetEntryIDs() ([]int64, error) {
-	debugStr := "[EntryQueryBuilder:GetEntryIDs] userID=%d, feedID=%d, categoryID=%d, status=%s, order=%s, direction=%s, offset=%d, limit=%d"
-	defer timer.ExecutionTime(time.Now(), fmt.Sprintf(debugStr, e.userID, e.feedID, e.categoryID, e.status, e.order, e.direction, e.offset, e.limit))
+	debugStr := "[EntryQueryBuilder:GetEntryIDs] userID=%d, feedID=%d, categoryID=%d, status=%s, order=%s, direction=%s, offset=%d, limit=%d, filter=%s"
+	defer timer.ExecutionTime(time.Now(), fmt.Sprintf(debugStr, e.userID, e.feedID, e.categoryID, e.status, e.order, e.direction, e.offset, e.limit, e.filter))
 
 	query := `
 		SELECT
@@ -333,6 +340,11 @@ func (e *EntryQueryBuilder) buildCondition() ([]interface{}, string) {
 	if e.filter != "" {
 		conditions = append(conditions, fmt.Sprintf("(e.content SIMILAR TO '%%(' || $%d || ')%%' OR e.title SIMILAR TO '%%(' || $%d || ')%%')", len(args)+1, len(args)+1))
 		args = append(args, e.filter)
+	}
+
+	if e.after != nil {
+		conditions = append(conditions, fmt.Sprintf("e.published_at > $%d", len(args)+1))
+		args = append(args, e.after)
 	}
 
 	return args, strings.Join(conditions, " AND ")

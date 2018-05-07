@@ -16,6 +16,9 @@ import (
 	"github.com/miniflux/miniflux/ui/session"
 	"github.com/miniflux/miniflux/ui/view"
 	"strconv"
+	"time"
+	"github.com/miniflux/miniflux/http/response"
+	"github.com/miniflux/miniflux/http/route"
 )
 
 // ShowFeedFilters shows all entries for the given filter.
@@ -66,6 +69,9 @@ func (c *Controller) ShowFeedFilters(w http.ResponseWriter, r *http.Request) {
 	builder.WithOffset(offset)
 	builder.WithLimit(nbItemsPerPage)
 	builder.WithFilter(current.Filters)
+
+	monthBefore := time.Now().AddDate(0, -1, 0)
+	builder.After(&monthBefore)
 
 	entries, err := builder.GetEntries()
 	if err != nil {
@@ -152,4 +158,39 @@ func (c *Controller) CreateFilter(w http.ResponseWriter, r *http.Request) {
 	view.Set("current", current)
 
 	html.OK(w, view.Render("feed_filters"))
+}
+
+// RemoveFilter remove filter record.
+func (c *Controller) RemoveFilter(w http.ResponseWriter, r *http.Request) {
+	ctx := context.New(r)
+
+	user, err := c.store.UserByID(ctx.UserID())
+	if err != nil {
+		html.ServerError(w, err)
+		return
+	}
+
+	filterID, err := request.IntParam(r, "filterID")
+	if err != nil {
+		html.BadRequest(w, err)
+		return
+	}
+
+	filter, err := c.store.Filter(ctx.UserID(), filterID)
+	if err != nil {
+		html.ServerError(w, err)
+		return
+	}
+
+	if filter == nil {
+		html.NotFound(w)
+		return
+	}
+
+	if err := c.store.RemoveFilter(user.ID, filter.ID); err != nil {
+		html.ServerError(w, err)
+		return
+	}
+
+	response.Redirect(w, r, route.Path(c.router, "filters"))
 }
