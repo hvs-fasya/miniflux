@@ -34,7 +34,7 @@ type EntryQueryBuilder struct {
 	before             *time.Time
 	starred            bool
 	filter             string
-	after             *time.Time
+	after              *time.Time
 }
 
 // WithStarred adds starred filter.

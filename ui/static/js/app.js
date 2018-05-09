@@ -35,6 +35,17 @@ class DomHelper {
 
         return result;
     }
+
+    static findParent(element, selector) {
+
+        for (; element && element !== document; element = element.parentNode) {
+            if (element.classList.contains(selector)) {
+                return element;
+                }
+        }
+
+        return null;
+        }
 }
 
 class TouchHandler {

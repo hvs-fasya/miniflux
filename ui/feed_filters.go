@@ -9,7 +9,9 @@ import (
 
 	"github.com/miniflux/miniflux/http/context"
 	"github.com/miniflux/miniflux/http/request"
+	"github.com/miniflux/miniflux/http/response"
 	"github.com/miniflux/miniflux/http/response/html"
+	"github.com/miniflux/miniflux/http/route"
 	"github.com/miniflux/miniflux/logger"
 	"github.com/miniflux/miniflux/model"
 	"github.com/miniflux/miniflux/ui/form"
@@ -17,8 +19,6 @@ import (
 	"github.com/miniflux/miniflux/ui/view"
 	"strconv"
 	"time"
-	"github.com/miniflux/miniflux/http/response"
-	"github.com/miniflux/miniflux/http/route"
 )
 
 // ShowFeedFilters shows all entries for the given filter.
