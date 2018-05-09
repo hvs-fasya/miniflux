@@ -11,6 +11,7 @@ import (
 	"github.com/miniflux/miniflux/http/context"
 	"github.com/miniflux/miniflux/http/request"
 	"github.com/miniflux/miniflux/http/response/json"
+	"github.com/miniflux/miniflux/logger"
 	"github.com/miniflux/miniflux/model"
 )
 
@@ -161,12 +162,29 @@ func (c *Controller) GetEntries(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	ctx := context.New(r)
+	userID := ctx.UserID()
+	filterName := request.QueryParam(r, "filter", "")
+
+	filter, err := c.store.FilterByName(userID, filterName)
+	if filterName != "" && err != nil {
+		json.BadRequest(w, errors.New("Unable to fetch filter"))
+		return
+	}
+	if filterName != "" && filter == nil {
+		json.NotFound(w, errors.New("Filter not found"))
+		return
+	}
+
+	logger.Debug("Filter: %s", filter.Filters)
+
 	builder := c.store.NewEntryQueryBuilder(context.New(r).UserID())
 	builder.WithStatus(status)
 	builder.WithOrder(order)
 	builder.WithDirection(direction)
 	builder.WithOffset(offset)
 	builder.WithLimit(limit)
+	builder.WithFilter(filter.Filters)
 
 	entries, err := builder.GetEntries()
 	if err != nil {

@@ -16,7 +16,7 @@ func (s *Storage) Filter(userID, filterID int64) (*model.Filter, error) {
 	defer timer.ExecutionTime(time.Now(), fmt.Sprintf("[Storage:Filter] userID=%d, getFilter=%d", userID, filterID))
 	var filter model.Filter
 	var pg_filters string
-	query := `SELECT id, user_id, filter_name, filters FROM filters WHERE user_id=$1 AND id=$2`
+	query := `SELECT id, user_id, filter_name, array_to_string(filters,',') FROM filters WHERE user_id=$1 AND id=$2`
 	err := s.db.QueryRow(query, userID, filterID).Scan(&filter.ID, &filter.UserID, &filter.FilterName, &pg_filters)
 	if err == sql.ErrNoRows {
 		return nil, nil
@@ -32,7 +32,7 @@ func (s *Storage) FilterByName(userID int64, name string) (*model.Filter, error)
 	defer timer.ExecutionTime(time.Now(), fmt.Sprintf("[Storage:FilterByName] userID=%d, name=%s", userID, name))
 	var filter model.Filter
 	var pg_filters string
-	query := `SELECT id, user_id, filter_name, filters FROM filters WHERE user_id=$1 AND filter_name=$2`
+	query := `SELECT id, user_id, filter_name, array_to_string(filters,',') FROM filters WHERE user_id=$1 AND filter_name=$2`
 	err := s.db.QueryRow(query, userID, name).Scan(&filter.ID, &filter.UserID, &filter.FilterName, &pg_filters)
 	if err == sql.ErrNoRows {
 		return nil, nil
@@ -113,21 +113,21 @@ func (s *Storage) RemoveFilter(userID, filterID int64) error {
 	return nil
 }
 
-// FilterByTitle finds a category by the title.
-func (s *Storage) FilterByTitle(userID int64, filterName string) (*model.Filter, error) {
-	defer timer.ExecutionTime(time.Now(), fmt.Sprintf("[Storage:FilterByTitle] userID=%d, title=%s", userID, filterName))
-	var filter model.Filter
-
-	query := `SELECT id, user_id, title FROM filters WHERE user_id=$1 AND title=$2`
-	err := s.db.QueryRow(query, userID, filterName).Scan(&filter.ID, &filter.UserID, &filter.FilterName)
-	if err == sql.ErrNoRows {
-		return nil, nil
-	} else if err != nil {
-		return nil, fmt.Errorf("Unable to fetch filter: %v", err)
-	}
-
-	return &filter, nil
-}
+//// FilterByTitle finds a category by the title.
+//func (s *Storage) FilterByTitle(userID int64, filterName string) (*model.Filter, error) {
+//	defer timer.ExecutionTime(time.Now(), fmt.Sprintf("[Storage:FilterByTitle] userID=%d, filterName=%s", userID, filterName))
+//	var filter model.Filter
+//
+//	query := `SELECT id, user_id, filter_name FROM filters WHERE user_id=$1 AND filter_name=$2`
+//	err := s.db.QueryRow(query, userID, filterName).Scan(&filter.ID, &filter.UserID, &filter.FilterName)
+//	if err == sql.ErrNoRows {
+//		return nil, nil
+//	} else if err != nil {
+//		return nil, fmt.Errorf("Unable to fetch filter: %v", err)
+//	}
+//
+//	return &filter, nil
+//}
 
 // FilterExists checks if the given filter exists into the database.
 func (s *Storage) FilterExists(userID, filterID int64) bool {

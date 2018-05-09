@@ -25,7 +25,7 @@ func (c *Controller) CreateFilter(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if c, err := c.store.FilterByTitle(userID, filter.FilterName); err != nil || c != nil {
+	if c, err := c.store.FilterByName(userID, filter.FilterName); err != nil || c != nil {
 		json.BadRequest(w, errors.New("This filter already exists"))
 		return
 	}

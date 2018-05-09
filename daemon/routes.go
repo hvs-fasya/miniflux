@@ -82,6 +82,7 @@ func routes(cfg *config.Config, store *storage.Storage, feedHandler *feed.Handle
 	apiRouter.HandleFunc("/filters", apiController.CreateFilter).Methods("POST")
 	apiRouter.HandleFunc("/filters", apiController.GetFilters).Methods("GET")
 	apiRouter.HandleFunc("/filters/{filterID}", apiController.RemoveFilter).Methods("DELETE")
+	//apiRouter.HandleFunc("/entries/filters/{filteID}", apiController.GetEntriesWithFilter).Methods("GET")
 
 	uiRouter := router.NewRoute().Subrouter()
 	uiRouter.Use(middleware.AppSession)
