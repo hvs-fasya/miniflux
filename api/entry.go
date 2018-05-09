@@ -11,7 +11,6 @@ import (
 	"github.com/miniflux/miniflux/http/context"
 	"github.com/miniflux/miniflux/http/request"
 	"github.com/miniflux/miniflux/http/response/json"
-	"github.com/miniflux/miniflux/logger"
 	"github.com/miniflux/miniflux/model"
 )
 
@@ -175,8 +174,9 @@ func (c *Controller) GetEntries(w http.ResponseWriter, r *http.Request) {
 		json.NotFound(w, errors.New("Filter not found"))
 		return
 	}
-
-	logger.Debug("Filter: %s", filter.Filters)
+	if filter == nil {
+		filter = new(model.Filter)
+	}
 
 	builder := c.store.NewEntryQueryBuilder(context.New(r).UserID())
 	builder.WithStatus(status)
