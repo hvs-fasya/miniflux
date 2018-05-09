@@ -7,7 +7,7 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-title" content="Miniflux">
+    <meta name="apple-mobile-web-app-title" content="VisaDB">
     <link rel="manifest" href="{{ route "webManifest" }}">
 
     <meta name="robots" content="noindex,nofollow">
@@ -23,7 +23,7 @@
     {{ if .csrf }}
         <meta name="X-CSRF-Token" value="{{ .csrf }}">
     {{ end }}
-    <title>{{template "title" .}} - Miniflux</title>
+    <title>{{template "title" .}} - VisaDB</title>
     {{ if .user }}
         <link rel="stylesheet" type="text/css" href="{{ route "stylesheet" "name" .user.Theme }}">
     {{ else }}
@@ -36,7 +36,7 @@
     <header class="header">
         <nav>
             <div class="logo">
-                <a href="{{ route "unread" }}">Mini<span>flux</span></a>
+                <a href="{{ route "unread" }}">Visa<span>DB</span></a>
             </div>
             <ul>
                 <li {{ if eq .menu "unread" }}class="active"{{ end }} title="{{ t "Keyboard Shortcut: %s" "g u" }}">

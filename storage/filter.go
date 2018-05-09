@@ -112,3 +112,29 @@ func (s *Storage) RemoveFilter(userID, filterID int64) error {
 
 	return nil
 }
+
+// FilterByTitle finds a category by the title.
+func (s *Storage) FilterByTitle(userID int64, filterName string) (*model.Filter, error) {
+	defer timer.ExecutionTime(time.Now(), fmt.Sprintf("[Storage:FilterByTitle] userID=%d, title=%s", userID, filterName))
+	var filter model.Filter
+
+	query := `SELECT id, user_id, title FROM filters WHERE user_id=$1 AND title=$2`
+	err := s.db.QueryRow(query, userID, filterName).Scan(&filter.ID, &filter.UserID, &filter.FilterName)
+	if err == sql.ErrNoRows {
+		return nil, nil
+	} else if err != nil {
+		return nil, fmt.Errorf("Unable to fetch filter: %v", err)
+	}
+
+	return &filter, nil
+}
+
+// FilterExists checks if the given filter exists into the database.
+func (s *Storage) FilterExists(userID, filterID int64) bool {
+	defer timer.ExecutionTime(time.Now(), fmt.Sprintf("[Storage:FilterExists] userID=%d, filterID=%d", userID, filterID))
+
+	var result int
+	query := `SELECT count(*) as c FROM filters WHERE user_id=$1 AND id=$2`
+	s.db.QueryRow(query, userID, filterID).Scan(&result)
+	return result >= 1
+}

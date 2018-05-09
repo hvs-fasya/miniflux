@@ -105,3 +105,15 @@ func decodeCategoryPayload(r io.ReadCloser) (*model.Category, error) {
 
 	return &category, nil
 }
+
+func decodeFilterPayload(r io.ReadCloser) (*model.Filter, error) {
+	var filter model.Filter
+
+	decoder := json.NewDecoder(r)
+	defer r.Close()
+	if err := decoder.Decode(&filter); err != nil {
+		return nil, fmt.Errorf("Unable to decode filter JSON object: %v", err)
+	}
+
+	return &filter, nil
+}
