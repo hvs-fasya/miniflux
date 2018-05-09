@@ -338,7 +338,7 @@ func (e *EntryQueryBuilder) buildCondition() ([]interface{}, string) {
 	}
 
 	if e.filter != "" {
-		conditions = append(conditions, fmt.Sprintf("(e.content SIMILAR TO '%%(' || $%d || ')%%' OR e.title SIMILAR TO '%%(' || $%d || ')%%')", len(args)+1, len(args)+1))
+		conditions = append(conditions, fmt.Sprintf("(LOWER(e.content) SIMILAR TO LOWER('%%(' || $%d || ')%%') OR LOWER(e.title) SIMILAR TO LOWER('%%(' || $%d || ')%%'))", len(args)+1, len(args)+1))
 		args = append(args, e.filter)
 	}
 
