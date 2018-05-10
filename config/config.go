@@ -14,7 +14,7 @@ import (
 
 const (
 	defaultBaseURL                 = "http://localhost"
-	defaultDatabaseURL             = "postgres://postgres:postgres@localhost/miniflux2?sslmode=disable"
+	defaultDatabaseURL             = "postgres://miniflux:miniflux@db/miniflux?sslmode=disable"
 	defaultWorkerPoolSize          = 5
 	defaultPollingFrequency        = 60
 	defaultBatchSize               = 10
