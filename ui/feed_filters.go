@@ -18,6 +18,7 @@ import (
 	"github.com/miniflux/miniflux/ui/session"
 	"github.com/miniflux/miniflux/ui/view"
 	"strconv"
+	"time"
 )
 
 // ShowFeedFilters shows all entries for the given filter.
@@ -69,8 +70,11 @@ func (c *Controller) ShowFeedFilters(w http.ResponseWriter, r *http.Request) {
 	builder.WithLimit(nbItemsPerPage)
 	builder.WithFilter(current.Filters)
 
-	//monthBefore := time.Now().AddDate(0, -1, 0)
-	//builder.After(&monthBefore)
+	months := 0 - request.QueryIntParam(r, "months", 0)
+	if months != 0 {
+		monthBefore := time.Now().AddDate(0, months, 0)
+		builder.After(&monthBefore)
+	}
 
 	entries, err := builder.GetEntries()
 	if err != nil {

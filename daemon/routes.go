@@ -151,6 +151,7 @@ func routes(cfg *config.Config, store *storage.Storage, feedHandler *feed.Handle
 
 	uiRouter.HandleFunc("/filters", uiController.ShowFeedFilters).Name("filters").Methods("GET")
 	uiRouter.HandleFunc("/filters/{id}", uiController.ShowFeedFilters).Name("filtersId").Methods("GET")
+	uiRouter.HandleFunc("/filters/{id}", uiController.ShowFeedFilters).Queries("months", "{months}").Name("filtersIdMonths").Methods("GET")
 	uiRouter.HandleFunc("/filters", uiController.CreateFilter).Name("createFilter").Methods("POST")
 	uiRouter.HandleFunc("/filters", uiController.RemoveFilter).Name("removeFilter").Methods("DELETE")
 	uiRouter.HandleFunc("/filters/{filterID}/remove", uiController.RemoveFilter).Name("removeFilter").Methods("POST")

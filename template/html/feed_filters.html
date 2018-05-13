@@ -48,14 +48,21 @@
                data-label-loading="{{ t "Work in progress..." }}"
                                       data-url="{{ route "removeFilter" "filterID" .ID }}">{{ t "Remove" }}</a></span><br>
     {{ end}}
-
     </ul>
-    <h3>Current filter: {{ .current.FilterName }}</h3>
-    <div class="items">
+    <br>
+    <div class="item">
+        <h3>Current filter: <i>{{ .current.FilterName }}</i></h3>
+        <div>
         {{ range .current.Filters }}
             <span><i>{{ . }}</i></span>
         {{ end}}
-
+        </div>
+        <br>
+        <div>
+            <span class="category"><a href="{{ route "filtersIdMonths" "id" .current.ID }}?months=1">{{ t "Last month" }}</a></span>
+            <span class="category"><a href="{{ route "filtersIdMonths" "id" .current.ID}}?months=3">{{ t "Last 3 month" }}</a></span>
+            <span class="category"><a href="{{ route "filtersId" "id" .current.ID}}">{{ t "All" }}</a></span>
+        </div>
     </div>
 {{ end }}
 </section>
