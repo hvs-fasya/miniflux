@@ -1,17 +1,19 @@
 version: '3'
 services:
   miniflux:
+#    image: "754371823479.dkr.ecr.us-west-2.amazonaws.com/visadb-news"
     image: visadb-news:latest
     ports:
       - "80:8080"
+      - "443:443"
     depends_on:
       - db
     environment:
       - DATABASE_URL=postgres://miniflux:miniflux@db/miniflux?sslmode=disable
       - RUN_MIGRATIONS=1
-#      - CREATE_ADMIN=1
-#      - ADMIN_USERNAME=admin
-#      - ADMIN_PASSWORD=12345678
+      - CREATE_ADMIN=1
+      - ADMIN_USERNAME=admin
+      - ADMIN_PASSWORD=12345678
   db:
     image: postgres:10.1
     environment:

@@ -1,0 +1,11 @@
+version: 1
+task_definition:
+  task_execution_role: ecsExecutionRole
+  ecs_network_mode: awsvpc
+run_params:
+  network_configuration:
+    awsvpc_configuration:
+      subnets:
+        - "subnet-bf778bc6"
+      security_groups:
+        - "sg-3f458540"
