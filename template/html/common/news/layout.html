@@ -1,0 +1,72 @@
+{{ define "news_base" }}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="VisaNews">
+    {{/*<link rel="manifest" href="{{ route "webManifest" }}">*/}}
+
+    <meta name="robots" content="noindex,nofollow">
+    <meta name="referrer" content="no-referrer">
+
+    {{/*<link rel="icon" type="image/png" href="{{ route "appIcon" "filename" "favicon.png" }}">*/}}
+    {{/*<link rel="apple-touch-icon" href="{{ route "appIcon" "filename" "touch-icon-iphone.png" }}">*/}}
+    {{/*<link rel="apple-touch-icon" sizes="72x72" href="{{ route "appIcon" "filename" "touch-icon-ipad.png" }}">*/}}
+    {{/*<link rel="apple-touch-icon" sizes="114x114" href="{{ route "appIcon" "filename" "touch-icon-iphone-retina.png" }}">*/}}
+    {{/*<link rel="apple-touch-icon" sizes="144x144" href="{{ route "appIcon" "filename" "touch-icon-ipad-retina.png" }}">*/}}
+    {{/*<link rel="shortcut icon" type="image/x-icon" href="{{ route "favicon" }}">*/}}
+
+{{ if .csrf }}
+    <meta name="X-CSRF-Token" value="{{ .csrf }}">
+{{ end }}
+    <title>{{template "title" .}} - News</title>
+    <link rel="stylesheet" type="text/css" href="{{ route "stylesheet" "name" "news" }}">
+    <script type="text/javascript" src="{{ route "javascript" }}" defer></script>
+</head>
+<body>
+<header class="header">
+    <nav>
+        <div class="logo">
+            <a href="{{ route "unread" }}">Mini<span>flux</span></a>
+        </div>
+        <ul>
+            <li {{ if eq .menu "unread" }}class="active"{{ end }} >
+                <a href="{{ route "unread" }}" data-page="unread">{{ t "Unread" }}</a>
+            </li>
+            <li {{ if eq .menu "starred" }}class="active"{{ end }} >
+                <a href="{{ route "starred" }}" data-page="starred">{{ t "Starred" }}</a>
+            </li>
+            <li {{ if eq .menu "history" }}class="active"{{ end }} >
+                <a href="{{ route "history" }}" data-page="history">{{ t "History" }}</a>
+            </li>
+            <li {{ if eq .menu "feeds" }}class="active"{{ end }} >
+                <a href="{{ route "feeds" }}" data-page="feeds">{{ t "Feeds" }}</a>
+            </li>
+            <li {{ if eq .menu "categories" }}class="active"{{ end }} >
+                <a href="{{ route "categories" }}" data-page="categories">{{ t "Categories" }}</a>
+            </li>
+            <li {{ if eq .menu "filters" }}class="active"{{ end }} >
+                <a href="{{ route "filters" }}" data-page="filters">{{ t "Filters" }}</a>
+            </li>
+            <li {{ if eq .menu "settings" }}class="active"{{ end }} title="{{ t "Keyboard Shortcut: %s" "g s" }}">
+                <a href="{{ route "settings" }}" data-page="settings">{{ t "Settings" }}</a>
+            </li>
+        </ul>
+    </nav>
+</header>
+{{ if .flashMessage }}
+<div class="flash-message alert alert-success">{{ .flashMessage }}</div>
+{{ end }}
+{{ if .flashErrorMessage }}
+<div class="flash-error-message alert alert-error">{{ .flashErrorMessage }}</div>
+{{ end }}
+<main>
+{{template "content" .}}
+</main>
+</body>
+</html>
+{{ end }}

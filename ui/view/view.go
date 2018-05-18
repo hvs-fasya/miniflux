@@ -28,6 +28,11 @@ func (v *View) Render(template string) []byte {
 	return v.tpl.Render(template, v.ctx.UserLanguage(), v.params)
 }
 
+// NewsRender executes the template with arguments.
+func (v *View) NewsRender(template string) []byte {
+	return v.tpl.NewsRender(template, v.ctx.UserLanguage(), v.params)
+}
+
 // New returns a new view with default parameters.
 func New(tpl *template.Engine, ctx *context.Context, sess *session.Session) *View {
 	b := &View{tpl, ctx, make(map[string]interface{})}

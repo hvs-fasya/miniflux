@@ -1,0 +1,24 @@
+{{ define "title"}}{{ t "About" }}{{ end }}
+
+{{ define "content"}}
+<section class="page-header">
+    <h1>{{ t "About" }}</h1>
+    <ul>
+        <li>
+            <a href="{{ route "settings" }}">{{ t "Settings" }}</a>
+        </li>
+        <li>
+            <a href="{{ route "integrations" }}">{{ t "Integrations" }}</a>
+        </li>
+    </ul>
+</section>
+
+<div class="panel">
+    <h3>{{ t "Authors" }}</h3>
+    <ul>
+        <li><strong>{{ t "Author:" }}</strong> Frédéric Guillot</li>
+        <li><strong>{{ t "License:" }}</strong> Apache 2.0</li>
+    </ul>
+</div>
+
+{{ end }}

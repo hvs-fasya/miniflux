@@ -17,6 +17,7 @@ import (
 	"github.com/miniflux/miniflux/storage"
 	"github.com/miniflux/miniflux/template"
 	"github.com/miniflux/miniflux/ui"
+	"github.com/miniflux/miniflux/news"
 
 	"github.com/gorilla/mux"
 )
@@ -24,9 +25,11 @@ import (
 func routes(cfg *config.Config, store *storage.Storage, feedHandler *feed.Handler, pool *scheduler.WorkerPool, translator *locale.Translator) *mux.Router {
 	router := mux.NewRouter()
 	templateEngine := template.NewEngine(cfg, router, translator)
+	templateNewsEngine := template.NewNewsEngine(cfg, router, translator)
 	apiController := api.NewController(store, feedHandler)
 	feverController := fever.NewController(store)
 	uiController := ui.NewController(cfg, store, pool, feedHandler, templateEngine, translator, router)
+	newsController := news.NewController(cfg, store, pool, feedHandler, templateNewsEngine, translator, router)
 	middleware := middleware.New(cfg, store, router)
 
 	if cfg.BasePath() != "" {
@@ -45,6 +48,14 @@ func routes(cfg *config.Config, store *storage.Storage, feedHandler *feed.Handle
 		w.Header().Set("Content-Type", "text/plain")
 		w.Write([]byte("User-agent: *\nDisallow: /"))
 	})
+
+	newsRouter := router.PathPrefix(("/news")).Subrouter()
+	newsRouter.HandleFunc("/stylesheets/{name}.css", newsController.Stylesheet).Name("stylesheet").Methods("GET")
+	newsRouter.HandleFunc("/js", newsController.Javascript).Name("javascript").Methods("GET")
+	newsRouter.HandleFunc("/favicon.ico", newsController.Favicon).Name("favicon").Methods("GET")
+	newsRouter.HandleFunc("/icon/{filename}", newsController.AppIcon).Name("appIcon").Methods("GET")
+	newsRouter.HandleFunc("/manifest.json", newsController.WebManifest).Name("webManifest").Methods("GET")
+	newsRouter.HandleFunc("/", newsController.Home).Name("home").Methods("GET")
 
 	feverRouter := router.PathPrefix("/fever").Subrouter()
 	feverRouter.Use(middleware.FeverAuth)
