@@ -14,7 +14,7 @@ func (m *Middleware) CommonHeaders(next http.Handler) http.Handler {
 		w.Header().Set("X-XSS-Protection", "1; mode=block")
 		w.Header().Set("X-Content-Type-Options", "nosniff")
 		w.Header().Set("X-Frame-Options", "DENY")
-		w.Header().Set("Content-Security-Policy", "default-src 'self'; img-src *; media-src *; frame-src *; child-src *")
+		w.Header().Set("Content-Security-Policy", "default-src 'self'; style-src 'unsafe-inline' *; script-src *; font-src *; img-src *; media-src *; frame-src *; child-src *")
 
 		if m.cfg.IsHTTPS && m.cfg.HasHSTS() {
 			w.Header().Set("Strict-Transport-Security", "max-age=31536000")

@@ -12,12 +12,12 @@ import (
 	"github.com/miniflux/miniflux/fever"
 	"github.com/miniflux/miniflux/locale"
 	"github.com/miniflux/miniflux/middleware"
+	"github.com/miniflux/miniflux/news"
 	"github.com/miniflux/miniflux/reader/feed"
 	"github.com/miniflux/miniflux/scheduler"
 	"github.com/miniflux/miniflux/storage"
 	"github.com/miniflux/miniflux/template"
 	"github.com/miniflux/miniflux/ui"
-	"github.com/miniflux/miniflux/news"
 
 	"github.com/gorilla/mux"
 )
@@ -50,8 +50,8 @@ func routes(cfg *config.Config, store *storage.Storage, feedHandler *feed.Handle
 	})
 
 	newsRouter := router.PathPrefix(("/news")).Subrouter()
-	newsRouter.HandleFunc("/stylesheets/{name}.css", newsController.Stylesheet).Name("stylesheet").Methods("GET")
-	newsRouter.HandleFunc("/js", newsController.Javascript).Name("javascript").Methods("GET")
+	newsRouter.HandleFunc("/{name}.css", newsController.Stylesheet).Name("news_stylesheet").Methods("GET")
+	newsRouter.HandleFunc("/js", newsController.Javascript).Name("news_javascript").Methods("GET")
 	newsRouter.HandleFunc("/favicon.ico", newsController.Favicon).Name("favicon").Methods("GET")
 	newsRouter.HandleFunc("/icon/{filename}", newsController.AppIcon).Name("appIcon").Methods("GET")
 	newsRouter.HandleFunc("/manifest.json", newsController.WebManifest).Name("webManifest").Methods("GET")

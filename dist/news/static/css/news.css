@@ -294,7 +294,9 @@
   .mdc-top-app-bar--fixed-adjust {
     margin-top: 56px; } }
 
-.header-container {
-  max-width: 1180px;
+mdc-top-app-bar {
+  background-color: #442C2E;
+  /* @alternate */
+  background-color: var(--mdc-theme-on-primary, #442C2E);
   width: 80%;
-  margin: 0 auto; }
+  margin-left: 10%; }
