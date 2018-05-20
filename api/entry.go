@@ -7,6 +7,7 @@ package api
 import (
 	"errors"
 	"net/http"
+	"time"
 
 	"github.com/miniflux/miniflux/http/context"
 	"github.com/miniflux/miniflux/http/request"
@@ -134,6 +135,7 @@ func (c *Controller) GetFeedEntries(w http.ResponseWriter, r *http.Request) {
 
 // GetEntries is the API handler to fetch entries.
 func (c *Controller) GetEntries(w http.ResponseWriter, r *http.Request) {
+
 	status := request.QueryParam(r, "status", "")
 	if status != "" {
 		if err := model.ValidateEntryStatus(status); err != nil {
@@ -185,6 +187,12 @@ func (c *Controller) GetEntries(w http.ResponseWriter, r *http.Request) {
 	builder.WithOffset(offset)
 	builder.WithLimit(limit)
 	builder.WithFilter(filter.Filters)
+
+	months := 0 - request.QueryIntParam(r, "months", 0)
+	if months != 0 {
+		monthBefore := time.Now().AddDate(0, months, 0)
+		builder.After(&monthBefore)
+	}
 
 	entries, err := builder.GetEntries()
 	if err != nil {

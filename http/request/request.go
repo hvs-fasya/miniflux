@@ -66,6 +66,7 @@ func QueryParam(r *http.Request, param, defaultValue string) string {
 // QueryIntParam returns a querystring parameter as integer.
 func QueryIntParam(r *http.Request, param string, defaultValue int) int {
 	value := r.URL.Query().Get(param)
+
 	if value == "" {
 		return defaultValue
 	}
