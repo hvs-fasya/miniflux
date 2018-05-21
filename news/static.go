@@ -17,15 +17,9 @@ import (
 // Stylesheet renders the CSS.
 func (c *Controller) Stylesheet(w http.ResponseWriter, r *http.Request) {
 	stylesheet := request.Param(r, "name", "news")
-	body := static.NewsStylesheets["common"]
-	etag := static.NewsStylesheetsChecksums["common"]
-
-	if theme, found := static.NewsStylesheets[stylesheet]; found {
-		body += theme
-		etag += static.NewsStylesheetsChecksums[stylesheet]
-	}
-
-	//response.Cache(w, r, "text/css; charset=utf-8", etag, []byte(body), 48*time.Hour)
+	body := static.NewsStylesheets[stylesheet]
+	etag := static.NewsStylesheetsChecksums[stylesheet]
+	response.Cache(w, r, "text/css; charset=utf-8", etag, []byte(body), 48*time.Hour)
 }
 
 // Javascript renders application client side code.
