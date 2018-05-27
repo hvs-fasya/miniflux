@@ -23,6 +23,14 @@ html, body {
 .demo-layout-transparent,
 .mdl-layout__header--transparent {
   background-color: white;
+  color: black;
+}
+
+.mdl-navigation.mdl-navigation__link--transparent {
+  color: black;
+  display: block;
+  line-height: 64px;
+  padding: 0 24px;
 }
 
 span.red-span {
