@@ -1,0 +1,32 @@
+{{ define "travel" }}
+
+<div class="mdl-layout__tab-panel mdl-cell mdl-cell--9-col-desktop mdl-cell--7-col-tablet mdl-cell--9-col-phone" id="travel">
+    <br>
+    <section class="section--center mdl-grid mdl-grid--no-spacing mdl-shadow--2dp">
+        <div class="mdl-card mdl-cell mdl-cell--9-col-desktop mdl-cell--6-col-tablet mdl-cell--4-col-phone">
+            <div class="mdl-card__supporting-text">
+                <h4>Travel Alerts</h4>
+                Dolore ex deserunt aute fugiat aute nulla ea sunt aliqua nisi cupidatat eu. Nostrud in laboris labore nisi amet do dolor eu fugiat consectetur elit cillum esse.
+            </div>
+        </div>
+    {{template "countries" .countries}}
+    </section>
+    <section class="section--center mdl-grid mdl-grid--no-spacing mdl-shadow--2dp">
+        <div class="mdl-card mdl-cell mdl-cell--12-col">
+            <div class="mdl-card__supporting-text mdl-grid mdl-grid--no-spacing">
+                <h4 class="mdl-cell mdl-cell--12-col">News Feed</h4>
+            {{ range $.entries }}
+                <div class="section__feed-container mdl-cell mdl-cell--2-col mdl-cell--1-col-phone">
+                    <div class="section__feed-container__feed">{{ .Feed.Title }}</div>
+                </div>
+                <div class="section__text mdl-cell mdl-cell--10-col-desktop mdl-cell--6-col-tablet mdl-cell--3-col-phone">
+                    <h5>{{ .Title }}</h5>
+                    <a href="{{ route "feedEntry" "feedID" .Feed.ID "entryID" .ID }}">{{ .Title }}</a>
+                </div>
+            {{ end }}
+            </div>
+        </div>
+    </section>
+</div>
+
+{{end }}

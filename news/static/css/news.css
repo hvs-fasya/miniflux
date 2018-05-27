@@ -20,8 +20,33 @@ html, body {
   padding: 0;
 }
 
+.demo-layout-transparent,
+.mdl-layout__header--transparent {
+  background-color: white;
+}
+
+span.red-span {
+  color: red;
+}
+
+.worldwide {
+  box-sizing: border-box;
+  border-radius: 2px;
+  background-color: white;
+  padding-left: 50px;
+  padding-right: 50px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  z-index: 10;
+}
+
 .side-cell {
     padding-left: 40px;
+}
+
+.mdl-menu {
+  height: 200px;
+  overflow-y: scroll;
 }
 
 .demo-card-square {
@@ -179,14 +204,25 @@ html, body {
   margin: 0;
   margin-bottom: 0.5em;
 }
+
+.mdl-demo section .section__text h6 {
+  font-size: inherit;
+  margin: 0;
+  margin-bottom: 0.5em;
+}
+
 .mdl-demo section .section__text a {
   text-decoration: none;
 }
 .mdl-demo section .section__circle-container > .section__circle-container__circle {
   width: 64px;
   height: 64px;
-  border-radius: 32px;
   margin: 8px 0;
+}
+.mdl-demo section .section__feed-container > .section__feed-container__feed {
+  width: 84px;
+  height: 84px;
+  margin: 8px 5px;
 }
 .mdl-demo section.section--footer .section__circle--big {
   width: 100px;
