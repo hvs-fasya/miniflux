@@ -26,11 +26,12 @@ html, body {
   color: black;
 }
 
-.mdl-navigation.mdl-navigation__link--transparent {
+.mdl-navigation__link--transparent {
   color: black;
   display: block;
   line-height: 64px;
   padding: 0 24px;
+  text-decoration: none;
 }
 
 span.red-span {
@@ -38,18 +39,17 @@ span.red-span {
 }
 
 .worldwide {
-  box-sizing: border-box;
-  border-radius: 2px;
-  background-color: white;
-  padding-left: 50px;
-  padding-right: 50px;
-  padding-top: 10px;
-  padding-bottom: 10px;
-  z-index: 10;
+  color: white;
 }
 
 .side-cell {
     padding-left: 40px;
+}
+
+.boxes-center {
+  max-width: 860px;
+  margin-top: 20px;
+  margin-bottom: 60px;
 }
 
 .mdl-menu {

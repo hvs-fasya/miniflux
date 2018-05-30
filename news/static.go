@@ -25,6 +25,12 @@ func (c *Controller) Stylesheet(w http.ResponseWriter, r *http.Request) {
 // Javascript renders application client side code.
 func (c *Controller) Javascript(w http.ResponseWriter, r *http.Request) {
 	response.Cache(w, r, "text/javascript; charset=utf-8", static.NewsJavascriptChecksums["app"], []byte(static.NewsJavascript["app"]), 48*time.Hour)
+	response.Cache(w, r, "text/javascript; charset=utf-8", static.NewsJavascriptChecksums["getmdl-select.min"], []byte(static.NewsJavascript["getmdl-select.min"]), 48*time.Hour)
+}
+
+// MdlSelect renders mdl-select client side code.
+func (c *Controller) MdlSelect(w http.ResponseWriter, r *http.Request) {
+	response.Cache(w, r, "text/javascript; charset=utf-8", static.NewsJavascriptChecksums["getmdl-select.min"], []byte(static.NewsJavascript["getmdl-select.min"]), 48*time.Hour)
 }
 
 // WebManifest renders web manifest file.
