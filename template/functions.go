@@ -23,9 +23,6 @@ type funcMap struct {
 
 func (f *funcMap) Map() template.FuncMap {
 	return template.FuncMap{
-		"delimit": func(str1 string, str2 string, del string) string {
-			return strings.Join([]string{str1, str2}, del)
-		},
 		"baseURL": func() string {
 			return f.cfg.BaseURL()
 		},
