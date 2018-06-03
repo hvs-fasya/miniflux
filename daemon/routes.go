@@ -53,10 +53,12 @@ func routes(cfg *config.Config, store *storage.Storage, feedHandler *feed.Handle
 	newsRouter.HandleFunc("/{name}.css", newsController.Stylesheet).Name("news_stylesheet").Methods("GET")
 	newsRouter.HandleFunc("/js", newsController.Javascript).Name("news_javascript").Methods("GET")
 	newsRouter.HandleFunc("/mdlselect", newsController.MdlSelect).Name("news_mdlselect").Methods("GET")
+	newsRouter.HandleFunc("/news", newsController.News).Name("news_news").Methods("GET")
 	newsRouter.HandleFunc("/favicon.ico", newsController.Favicon).Name("favicon").Methods("GET")
 	//newsRouter.HandleFunc("/icon/{filename}", newsController.AppIcon).Name("appIcon").Methods("GET")
 	newsRouter.HandleFunc("/manifest.json", newsController.WebManifest).Name("webManifest").Methods("GET")
 	newsRouter.HandleFunc("/", newsController.Home).Name("home").Methods("GET")
+	newsRouter.HandleFunc("/sources", newsController.Sources).Name("sources").Methods("GET")
 	newsRouter.HandleFunc("/icon/{iconID}", newsController.ShowIcon).Name("feedicon").Methods("GET")
 
 	feverRouter := router.PathPrefix("/fever").Subrouter()

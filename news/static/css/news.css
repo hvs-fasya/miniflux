@@ -20,6 +20,14 @@ html, body {
   padding: 0;
 }
 
+.ticker {
+  background-color: #673ab7;
+  color: white;
+  font-size: 18px;
+  height: 50px;
+  margin-top: 20px;
+}
+
 .demo-layout-transparent,
 .mdl-layout__header--transparent {
   background-color: white;

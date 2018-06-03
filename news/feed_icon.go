@@ -1,12 +1,12 @@
 package news
 
 import (
-"net/http"
-"time"
+	"net/http"
+	"time"
 
-"github.com/miniflux/miniflux/http/request"
-"github.com/miniflux/miniflux/http/response"
-"github.com/miniflux/miniflux/http/response/html"
+	"github.com/miniflux/miniflux/http/request"
+	"github.com/miniflux/miniflux/http/response"
+	"github.com/miniflux/miniflux/http/response/html"
 )
 
 // ShowIcon shows the feed icon.
@@ -30,4 +30,3 @@ func (c *Controller) ShowIcon(w http.ResponseWriter, r *http.Request) {
 
 	response.Cache(w, r, icon.MimeType, icon.Hash, icon.Content, 72*time.Hour)
 }
-

@@ -33,6 +33,11 @@ func (c *Controller) MdlSelect(w http.ResponseWriter, r *http.Request) {
 	response.Cache(w, r, "text/javascript; charset=utf-8", static.NewsJavascriptChecksums["getmdl-select.min"], []byte(static.NewsJavascript["getmdl-select.min"]), 48*time.Hour)
 }
 
+// News renders News client side code.
+func (c *Controller) News(w http.ResponseWriter, r *http.Request) {
+	response.Cache(w, r, "text/javascript; charset=utf-8", static.NewsJavascriptChecksums["news"], []byte(static.NewsJavascript["news"]), 48*time.Hour)
+}
+
 // WebManifest renders web manifest file.
 func (c *Controller) WebManifest(w http.ResponseWriter, r *http.Request) {
 	type webManifestIcon struct {

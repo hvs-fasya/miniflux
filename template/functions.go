@@ -5,16 +5,15 @@
 package template
 
 import (
-	"html/template"
-	"net/mail"
-	"strings"
-	"time"
-
 	"github.com/gorilla/mux"
 	"github.com/miniflux/miniflux/config"
 	"github.com/miniflux/miniflux/filter"
 	"github.com/miniflux/miniflux/http/route"
 	"github.com/miniflux/miniflux/url"
+	"html/template"
+	"net/mail"
+	"strings"
+	"time"
 )
 
 type funcMap struct {
@@ -24,6 +23,9 @@ type funcMap struct {
 
 func (f *funcMap) Map() template.FuncMap {
 	return template.FuncMap{
+		"delimit": func(str1 string, str2 string, del string) string {
+			return strings.Join([]string{str1, str2}, del)
+		},
 		"baseURL": func() string {
 			return f.cfg.BaseURL()
 		},
