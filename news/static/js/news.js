@@ -2,6 +2,22 @@
 (function() {
     'use strict';
 
+    // class DialogHandler {
+    //     constructor() {
+    //         this.dialog = document.querySelector('dialog');
+    //         this.showDialogButton = document.querySelector('#show-dialog');
+    //     }
+    //     if (dialog.showModal) {
+    //         dialogPolyfill.registerDialog(this.dialog);
+    //     }
+    //     this.showDialogButton.addEventListener('click', function() {
+    //         dialog.showModal();
+    //     });
+    //     this.dialog.querySelector('.close').addEventListener('click', function() {
+    //         dialog.close();
+    //     });
+    // }
+
     class DomHelper {
         static isVisible(element) {
             return element.offsetParent !== null;

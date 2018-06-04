@@ -33,6 +33,11 @@ func (c *Controller) MdlSelect(w http.ResponseWriter, r *http.Request) {
 	response.Cache(w, r, "text/javascript; charset=utf-8", static.NewsJavascriptChecksums["getmdl-select.min"], []byte(static.NewsJavascript["getmdl-select.min"]), 48*time.Hour)
 }
 
+// DialogPolyfill renders DialogPolyfill client side code.
+func (c *Controller) DialogPolyfill(w http.ResponseWriter, r *http.Request) {
+	response.Cache(w, r, "text/javascript; charset=utf-8", static.NewsJavascriptChecksums["dialog-polyfill"], []byte(static.NewsJavascript["dialog-polyfill"]), 48*time.Hour)
+}
+
 // News renders News client side code.
 func (c *Controller) News(w http.ResponseWriter, r *http.Request) {
 	response.Cache(w, r, "text/javascript; charset=utf-8", static.NewsJavascriptChecksums["news"], []byte(static.NewsJavascript["news"]), 48*time.Hour)

@@ -50,6 +50,7 @@
     <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.deep_purple-pink.min.css">
     <link rel="stylesheet" type="text/css" href="{{ route "news_stylesheet" "name" "news"}}">
     <link rel="stylesheet" type="text/css" href="{{ route "news_stylesheet" "name" "getmdl-select.min"}}">
+    <link rel="stylesheet" type="text/css" href="{{ route "news_stylesheet" "name" "dialog-polyfill"}}">
     <style>
         #view-source {
             position: fixed;
@@ -63,6 +64,26 @@
     </style>
 </head>
 <body class="mdl-demo mdl-color--grey-100 mdl-color-text--grey-700 mdl-base">
+<dialog class="mdl-dialog">
+    <h4 class="mdl-dialog__title">Contacts</h4>
+    <div class="mdl-dialog__content">
+        <p>
+            Here should be the Contacts
+            Here should be the Contacts
+            Here should be the Contacts
+            Here should be the Contacts
+            Here should be the Contacts
+            Here should be the Contacts
+            Here should be the Contacts
+            Here should be the Contacts
+            Here should be the Contacts
+            Here should be the Contacts
+        </p>
+    </div>
+    <div class="mdl-dialog__actions">
+        <button type="button" class="mdl-button close">Close</button>
+    </div>
+</dialog>
     <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
         <header class="mdl-layout__header mdl-layout__header--scroll mdl-color--primary">
             <div class="mdl-layout--large-screen-only mdl-layout__header-row demo-layout-transparent">
@@ -83,7 +104,7 @@
                             <input type="submit" form="subscribe-header" class="mdl-button" value="OK">
                         {{/*<button type="submit" form="subscribe-header" class="mdl-button mdl-js-button mdl-js-ripple-effect">OK</button>*/}}
                         </form>
-                        <a role="button" class="mdl-navigation__link--transparent" href="#">CONTACTS</a>
+                        <a role="button" id="show-contacts" class="mdl-navigation__link--transparent" href="#">CONTACTS</a>
                     </nav>
 
                 </div>
@@ -135,7 +156,21 @@
     <script src="https://code.getmdl.io/1.3.0/material.min.js"></script>
     <script type="text/javascript" src="{{ route "javascript" }}"></script>
     <script type="text/javascript" src="{{ route "news_mdlselect" }}"></script>
+    <script type="text/javascript" src="{{ route "news_dialog-polyfill" }}"></script>
     <script type="text/javascript" src="{{ route "news_news" }}"></script>
+        <script>
+            var dialog = document.querySelector('dialog');
+            var showDialogButton = document.querySelector('#show-contacts');
+            if (! dialog.showModal) {
+                dialogPolyfill.registerDialog(dialog);
+            }
+            showDialogButton.addEventListener('click', function() {
+                dialog.showModal();
+            });
+            dialog.querySelector('.close').addEventListener('click', function() {
+                dialog.close();
+            });
+        </script>
 </body>
 </html>
 {{end}}

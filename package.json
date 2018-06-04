@@ -2,6 +2,7 @@
   "requires": true,
   "lockfileVersion": 1,
   "dependencies": {
+    "@material/dialog": "^0.36.0",
     "getmdl-select": {
       "integrity": "sha1-S9vXf9/T57LD+sUDoy0lsIcuEyE=",
       "requires": {
