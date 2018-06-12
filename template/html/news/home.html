@@ -1,109 +1,10 @@
 {{ define "content"}}
 <!-- OFFICIAL NEWS -->
 <div class="mdl-layout__tab-panel is-active" id="official">
-    <br>
-{{ range $i, $e := .entries }}
-{{ if eq $i 2 }}
-    <div class="mdl-grid boxes-center">
-        <div class="demo-card-square mdl-card mdl-shadow--2dp mdl-cell mdl-cell--6-col">
-            <div class="mdl-card__title mdl-card--expand">
-                <h2 class="mdl-card__title-text">VISA UPDATES</h2>
-            </div>
-            <div class="mdl-card__supporting-text">
-                Get Visa Updates alerts
-            </div>
-            <div class="mdl-card__actions mdl-card--border">
-                <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
-                    View Updates
-                </a>
-            </div>
-        </div>
-        <div class="demo-card-square mdl-card mdl-shadow--2dp mdl-cell mdl-cell--6-col">
-            <div class="mdl-card__title mdl-card--expand">
-                <h2 class="mdl-card__title-text">SEARCH VISA</h2>
-            </div>
-            <div class="mdl-card__supporting-text">
-                Search Global Visas
-            </div>
-            <div class="mdl-card__actions mdl-card--border">
-                <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
-                    Search
-                </a>
-            </div>
-        </div>
-    </div>
-{{ end }}
-    <section class="section--center mdl-grid mdl-grid--no-spacing mdl-shadow--2dp">
-        <div class="mdl-card mdl-cell mdl-cell--12-col">
-            <div class="mdl-card__supporting-text mdl-grid mdl-grid--no-spacing">
-                <div class="section__feed-container mdl-cell mdl-cell--2-col mdl-cell--1-col-phone">
-                    <div class="section__feed-container__feed">
-                        <img src="{{ route "feedicon" "iconID" $e.Feed.Icon.IconID }}" width="56" height="56">
-                    </div>
-                </div>
-                <div class="section__text mdl-cell mdl-cell--10-col-desktop mdl-cell--6-col-tablet mdl-cell--3-col-phone">
-                    <h4>{{ noescape $e.Title }}</h4>
-                    <h5>{{ noescape $e.Content }}</h5>
-                    <a role="button" href="#" onclick="toggleEntry()">Show more...</a>
-                </div>
-            </div>
-        </div>
-    </section>
-{{end}}
 </div>
 <!-- MEDIA NEWS -->
+{{/*{{ template "news_media" . }}*/}}
 <div class="mdl-layout__tab-panel" id="media">
-    <br>
-{{ range $i, $e := .entries }}
-{{ if eq $i 2 }}
-    <div class="mdl-grid boxes-center">
-        <div class="demo-card-square mdl-card mdl-shadow--2dp mdl-cell mdl-cell--6-col">
-            <div class="mdl-card__title mdl-card--expand">
-                <h2 class="mdl-card__title-text">VISA UPDATES</h2>
-            </div>
-            <div class="mdl-card__supporting-text">
-                Get Visa Updates alerts
-            </div>
-            <div class="mdl-card__actions mdl-card--border">
-                <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
-                    View Updates
-                </a>
-            </div>
-        </div>
-        <div class="demo-card-square mdl-card mdl-shadow--2dp mdl-cell mdl-cell--6-col">
-            <div class="mdl-card__title mdl-card--expand">
-                <h2 class="mdl-card__title-text">SEARCH VISA</h2>
-            </div>
-            <div class="mdl-card__supporting-text">
-                Search Global Visas
-            </div>
-            <div class="mdl-card__actions mdl-card--border">
-                <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
-                    Search
-                </a>
-            </div>
-        </div>
-    </div>
-{{ end }}
-    <section class="section--center mdl-grid mdl-grid--no-spacing mdl-shadow--2dp">
-        <div class="mdl-card mdl-cell mdl-cell--12-col">
-            <div class="mdl-card__supporting-text mdl-grid mdl-grid--no-spacing">
-                <div class="section__feed-container mdl-cell mdl-cell--2-col mdl-cell--1-col-phone">
-                    <div class="section__feed-container__feed">
-                        <img src="{{ route "feedicon" "iconID" $e.Feed.Icon.IconID }}" width="56" height="56">
-                    </div>
-                </div>
-                <div class="section__text mdl-cell mdl-cell--10-col-desktop mdl-cell--6-col-tablet mdl-cell--3-col-phone">
-                    <h4>{{ noescape $e.Title }}</h4>
-                    <h5>{{ noescape $e.Content }}</h5>
-                {{/*<a role="button" href="{{ route "feedEntry" "feedID" $e.Feed.ID "entryID" $e.ID }}">{{ $e.Title }}</a>*/}}
-                {{/*<a role="button" href="{{ route "feedEntry" "feedID" $e.Feed.ID "entryID" $e.ID }}">{{ $e.Title }}</a>*/}}
-                    <a role="button" href="#" onclick="toggleEntry()">Show more...</a>
-                </div>
-            </div>
-        </div>
-    </section>
-{{end}}
 </div>
 <!-- TRAVEL ALERTS -->
 <div class="mdl-layout__tab-panel" id="travel">
@@ -132,7 +33,7 @@
                 Search Global Visas
             </div>
             <div class="mdl-card__actions mdl-card--border">
-                <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+                <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" href="http://visadb.io" target="_blank">
                     Search
                 </a>
             </div>
@@ -142,17 +43,20 @@
     <section class="section--center mdl-grid mdl-grid--no-spacing mdl-shadow--2dp">
         <div class="mdl-card mdl-cell mdl-cell--12-col">
             <div class="mdl-card__supporting-text mdl-grid mdl-grid--no-spacing">
-                <div class="section__feed-container mdl-cell mdl-cell--2-col mdl-cell--1-col-phone">
-                    <div class="section__feed-container__feed">
-                        <img src="{{ route "feedicon" "iconID" $e.Feed.Icon.IconID }}" width="56" height="56">
-                    </div>
-                </div>
                 <div class="section__text mdl-cell mdl-cell--10-col-desktop mdl-cell--6-col-tablet mdl-cell--3-col-phone">
                     <h4>{{ noescape $e.Title }}</h4>
-                    <h5>{{ noescape $e.Content }}</h5>
-                {{/*<a role="button" href="{{ route "feedEntry" "feedID" $e.Feed.ID "entryID" $e.ID }}">{{ $e.Title }}</a>*/}}
-                {{/*<a role="button" href="{{ route "feedEntry" "feedID" $e.Feed.ID "entryID" $e.ID }}">{{ $e.Title }}</a>*/}}
-                    <a role="button" href="#" onclick="toggleEntry()">Show more...</a>
+                    <p class="mdl-list__item">
+                        <span class="mdl-list__item-primary-content">
+                            <i class="material-icons mdl-list__item-icon">schedule</i>
+                        {{ elapsed "UTC" $e.Date }}
+                            <span class="mdl-layout-spacer"></span>
+                        {{ if gt $e.Feed.Icon.IconID 0 }}
+                            <i class="mdl-list__item-icon"><img src="{{ route "feedicon" "iconID" $e.Feed.Icon.IconID }}" width="26" height="26"></i>
+                        {{ end }}
+                        {{ $e.Feed.Title }}
+                        </span>
+                    </p>
+                    <a role="button" href="#" onclick="toggleEntry()">READ FULL STORY</a>
                 </div>
             </div>
         </div>
@@ -193,7 +97,7 @@
                 Search Global Visas
             </div>
             <div class="mdl-card__actions mdl-card--border">
-                <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+                <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" href="http://visadb.io" target="_blank">
                     Search
                 </a>
             </div>
@@ -203,75 +107,25 @@
     <section class="section--center mdl-grid mdl-grid--no-spacing mdl-shadow--2dp">
         <div class="mdl-card mdl-cell mdl-cell--12-col">
             <div class="mdl-card__supporting-text mdl-grid mdl-grid--no-spacing">
-                <div class="section__feed-container mdl-cell mdl-cell--2-col mdl-cell--1-col-phone">
-                    <div class="section__feed-container__feed">
-                        <img src="{{ route "feedicon" "iconID" $e.Feed.Icon.IconID }}" width="56" height="56">
-                    </div>
-                </div>
                 <div class="section__text mdl-cell mdl-cell--10-col-desktop mdl-cell--6-col-tablet mdl-cell--3-col-phone">
                     <h4>{{ noescape $e.Title }}</h4>
-                    <h5>{{ noescape $e.Content }}</h5>
-                    <a role="button" href="#" onclick="toggleEntry()">Show more...</a>
+                    <p class="mdl-list__item">
+                        <span class="mdl-list__item-primary-content">
+                            <i class="material-icons mdl-list__item-icon">schedule</i>
+                        {{ elapsed "UTC" $e.Date }}
+                            <span class="mdl-layout-spacer"></span>
+                        {{ if gt $e.Feed.Icon.IconID 0 }}
+                            <i class="mdl-list__item-icon"><img src="{{ route "feedicon" "iconID" $e.Feed.Icon.IconID }}" width="26" height="26"></i>
+                        {{ end }}
+                        {{ $e.Feed.Title }}
+                        </span>
+                    </p>
+                    <a role="button" href="#" onclick="toggleEntry()">READ FULL STORY</a>
                 </div>
             </div>
         </div>
     </section>
 {{end}}
 </div>
-
-{{/*</div>*/}}
-{{/*<footer class="mdl-mega-footer">*/}}
-{{/*<div class="mdl-mega-footer--middle-section">*/}}
-{{/*<div class="mdl-mega-footer--drop-down-section">*/}}
-{{/*<input class="mdl-mega-footer--heading-checkbox" type="checkbox" checked>*/}}
-{{/*<h1 class="mdl-mega-footer--heading">Features</h1>*/}}
-{{/*<ul class="mdl-mega-footer--link-list">*/}}
-{{/*<li><a href="#">About</a></li>*/}}
-{{/*<li><a href="#">Terms</a></li>*/}}
-{{/*<li><a href="#">Partners</a></li>*/}}
-{{/*<li><a href="#">Updates</a></li>*/}}
-{{/*</ul>*/}}
-{{/*</div>*/}}
-{{/*<div class="mdl-mega-footer--drop-down-section">*/}}
-{{/*<input class="mdl-mega-footer--heading-checkbox" type="checkbox" checked>*/}}
-{{/*<h1 class="mdl-mega-footer--heading">Details</h1>*/}}
-{{/*<ul class="mdl-mega-footer--link-list">*/}}
-{{/*<li><a href="#">Spec</a></li>*/}}
-{{/*<li><a href="#">Tools</a></li>*/}}
-{{/*<li><a href="#">Resources</a></li>*/}}
-{{/*</ul>*/}}
-{{/*</div>*/}}
-{{/*<div class="mdl-mega-footer--drop-down-section">*/}}
-{{/*<input class="mdl-mega-footer--heading-checkbox" type="checkbox" checked>*/}}
-{{/*<h1 class="mdl-mega-footer--heading">Technology</h1>*/}}
-{{/*<ul class="mdl-mega-footer--link-list">*/}}
-{{/*<li><a href="#">How it works</a></li>*/}}
-{{/*<li><a href="#">Patterns</a></li>*/}}
-{{/*<li><a href="#">Usage</a></li>*/}}
-{{/*<li><a href="#">Products</a></li>*/}}
-{{/*<li><a href="#">Contracts</a></li>*/}}
-{{/*</ul>*/}}
-{{/*</div>*/}}
-{{/*<div class="mdl-mega-footer--drop-down-section">*/}}
-{{/*<input class="mdl-mega-footer--heading-checkbox" type="checkbox" checked>*/}}
-{{/*<h1 class="mdl-mega-footer--heading">FAQ</h1>*/}}
-{{/*<ul class="mdl-mega-footer--link-list">*/}}
-{{/*<li><a href="#">Questions</a></li>*/}}
-{{/*<li><a href="#">Answers</a></li>*/}}
-{{/*<li><a href="#">Contact us</a></li>*/}}
-{{/*</ul>*/}}
-{{/*</div>*/}}
-{{/*</div>*/}}
-{{/*<div class="mdl-mega-footer--bottom-section">*/}}
-{{/*<div class="mdl-logo">*/}}
-{{/*More Information*/}}
-{{/*</div>*/}}
-{{/*<ul class="mdl-mega-footer--link-list">*/}}
-{{/*<li><a href="https://developers.google.com/web/starter-kit/">Web Starter Kit</a></li>*/}}
-{{/*<li><a href="#">Help</a></li>*/}}
-{{/*<li><a href="#">Privacy and Terms</a></li>*/}}
-{{/*</ul>*/}}
-{{/*</div>*/}}
-{{/*</footer>*/}}
 
 {{ end }}

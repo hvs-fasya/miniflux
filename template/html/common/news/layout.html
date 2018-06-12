@@ -51,6 +51,9 @@
     <link rel="stylesheet" type="text/css" href="{{ route "news_stylesheet" "name" "news"}}">
     <link rel="stylesheet" type="text/css" href="{{ route "news_stylesheet" "name" "getmdl-select.min"}}">
     <link rel="stylesheet" type="text/css" href="{{ route "news_stylesheet" "name" "dialog-polyfill"}}">
+    {{ if .csrf }}
+        <meta name="X-CSRF-Token" value="{{ .csrf }}">
+    {{ end }}
     <style>
         #view-source {
             position: fixed;
@@ -64,7 +67,18 @@
     </style>
 </head>
 <body class="mdl-demo mdl-color--grey-100 mdl-color-text--grey-700 mdl-base">
-<dialog class="mdl-dialog">
+<!-- DATA SOURCES DIALOG -->
+<dialog class="mdl-dialog" id="sourcesContent">
+    <h4 class="mdl-dialog__title">Data Sources</h4>
+    <div>
+        {{ template "sources" }}
+    </div>
+    <div class="mdl-dialog__actions">
+        <button type="button" class="mdl-button close">Close</button>
+    </div>
+</dialog>
+<!-- CONTACTS DIALOG -->
+<dialog class="mdl-dialog" id="contactsContent">
     <h4 class="mdl-dialog__title">Contacts</h4>
     <div class="mdl-dialog__content">
         <p>
@@ -84,6 +98,17 @@
         <button type="button" class="mdl-button close">Close</button>
     </div>
 </dialog>
+<!-- ENTRIES FULL CONTENT DIALOG -->
+<dialog class="mdl-dialog" id="entryContent">
+    <div class="mdl-dialog__title" id="entryContentHeader"></div>
+    <div class="mdl-dialog__content">
+        <div id="entryContentBody"></div>
+    </div>
+    <div class="mdl-dialog__actions">
+        <button type="button" class="mdl-button close">Close</button>
+    </div>
+</dialog>
+
     <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
         <header class="mdl-layout__header mdl-layout__header--scroll mdl-color--primary">
             <div class="mdl-layout--large-screen-only mdl-layout__header-row demo-layout-transparent">
@@ -93,15 +118,15 @@
                     <div class="mdl-layout-spacer"></div>
                     <!-- Navigation -->
                     <nav class="mdl-navigation">
-                        <a role="button" class="mdl-navigation__link--transparent" href="#">SEARCH VISA</a>
-                        <a role="button" class="mdl-navigation__link--transparent" href="{{ route "sources" }}">DATA SOURCES</a>
+                        <a role="button" class="mdl-navigation__link--transparent" href="http://visadb.io" target="_blank">SEARCH VISA</a>
+                        <a role="button" class="mdl-navigation__link--transparent" href="#" id="show-sources">DATA SOURCES</a>
                         <a role="button" class="mdl-navigation__link--transparent" href="#">SUBSCRIBE</a>
                         <form action="#" id="subscribe-header">
                             <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
                                 <input class="mdl-textfield__input" type="text" id="subscribe" required>
                                 <label class="mdl-textfield__label" for="subscribe">Your Email...</label>
                             </div>
-                            <input type="submit" form="subscribe-header" class="mdl-button" value="OK">
+                            <input type="submit" form="subscribe-header" class="mdl-button mdl-js-button mdl-js-ripple-effect" value="OK">
                         {{/*<button type="submit" form="subscribe-header" class="mdl-button mdl-js-button mdl-js-ripple-effect">OK</button>*/}}
                         </form>
                         <a role="button" id="show-contacts" class="mdl-navigation__link--transparent" href="#">CONTACTS</a>
@@ -159,7 +184,7 @@
     <script type="text/javascript" src="{{ route "news_dialog-polyfill" }}"></script>
     <script type="text/javascript" src="{{ route "news_news" }}"></script>
         <script>
-            var dialog = document.querySelector('dialog');
+            var dialog = document.querySelector('#contactsContent');
             var showDialogButton = document.querySelector('#show-contacts');
             if (! dialog.showModal) {
                 dialogPolyfill.registerDialog(dialog);
@@ -169,6 +194,32 @@
             });
             dialog.querySelector('.close').addEventListener('click', function() {
                 dialog.close();
+            });
+
+            var sources = document.querySelector('#sourcesContent');
+            var showSourcesButton = document.querySelector('#show-sources');
+            if (! sources.showModal) {
+                dialogPolyfill.registerDialog(sources);
+            }
+            showSourcesButton.addEventListener('click', function() {
+                sources.showModal();
+            });
+            sources.querySelector('.close').addEventListener('click', function() {
+                sources.close();
+            });
+
+            var entryDialog = document.querySelector("#entryContent");
+            // var showEntryButton = document.querySelector('a[]');
+            if (! entryDialog.showModal) {
+                dialogPolyfill.registerDialog(entryDialog);
+            }
+            // showEntryButton.addEventListener('click', function() {
+            //     entryDialog.showModal();
+            // });
+            entryDialog.querySelector('.close').addEventListener('click', function() {
+                let body = entryDialog.querySelector('#entryContentBody');
+                body.innerHTML = "";
+                entryDialog.close();
             });
         </script>
 </body>

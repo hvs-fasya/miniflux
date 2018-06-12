@@ -234,6 +234,7 @@
             container.id = "modal-container";
             container.appendChild(document.importNode(fragment, true));
             document.body.appendChild(container);
+            container.style.visibility = 'visible';
 
             let closeButton = document.querySelector("a.btn-close-modal");
             if (closeButton !== null) {
@@ -252,53 +253,97 @@
         }
     }
 
+
+    class TabHandler {
+
+        constructor(tabname, offset) {
+            this.tabname = tabname;
+            this.offset = offset;
+            this.limit = 10;
+            this.PrevButton = null;
+            this.NextButton = null;
+        }
+
+        LoadTab(){
+            let tab = document.getElementById(this.tabname);
+            let xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == 4 && xhr.status == 200) {
+                    tab.innerHTML = xhr.responseText;
+                    let prev = tab.querySelector("[data-page='prev']");
+                    let next = tab.querySelector("[data-page='next']");
+                    this.PrevButton = prev;
+                    this.NextButton = next;
+                    this.ListenButtons();
+                    this.ListenDownloads();
+                }
+            }.bind( this );
+            xhr.open("GET", "/news/" + this.tabname + "?offset=" + this.offset + "&limit=" + this.limit, true);
+            try {
+                xhr.send();
+            } catch (err) {
+                tab.innerHTML = "Not Found"
+            }
+        }
+
+        ListenButtons(){
+            this.PrevButton.addEventListener("click",(event) => {
+                event.stopPropagation();
+                this.offset = this.offset - this.limit;
+                this.LoadTab();
+            },false);
+
+            this.NextButton.addEventListener("click",(event) => {
+                event.stopPropagation();
+                this.offset = this.offset + this.limit;
+                this.LoadTab();
+            },false);
+        }
+
+        ListenDownloads(){
+            let downloads = document.querySelectorAll("a[data-fetch-content-url]");
+            downloads.forEach((element) => {
+                element.addEventListener("click",(event) => {
+                    event.stopPropagation();
+                    let header = event.target.parentElement.cloneNode(true);
+                    let link = header.querySelector("a[data-fetch-content-url]");
+                    header.removeChild(link);
+                    this.fetchOriginalContent(event.target, header);
+                });
+            });
+        }
+
+        fetchOriginalContent(element, header){
+            document.querySelector("#entryContentHeader").innerHTML = header.innerHTML;
+            let request = new RequestBuilder(element.dataset.fetchContentUrl);
+            request.withCallback((response) => {
+                response.json().then((data) => {
+                    if (data.hasOwnProperty("content")) {
+                        // let template = document.createTextNode(data.content);
+                        let body = document.querySelector("#entryContentBody");
+                        body.innerHTML = data.content;
+                        let images = body.querySelectorAll("audio, canvas, iframe, img, svg, video");
+                        images.forEach((img) => {
+                            img.style.maxWidth = "95%";
+                        });
+                        document.querySelector('#entryContent').showModal();
+                    } else {
+                        document.querySelector("#entryContentBody").innerHTML = '<div>NO CONTENT</div>';
+                        document.querySelector('#entryContent').showModal();
+                    }
+                });
+            });
+            request.execute();
+        }
+    }
+
     document.addEventListener("DOMContentLoaded", function() {
         FormHandler.handleSubmitButtons();
 
-        let touchHandler = new TouchHandler();
-        touchHandler.listen();
-
-        let mouseHandler = new MouseHandler();
-
-        mouseHandler.onClick("a[data-save-entry]", (event) => {
-            event.preventDefault();
-            EntryHandler.saveEntry(event.target);
-        });
-
-        mouseHandler.onClick("a[data-toggle-bookmark]", (event) => {
-            event.preventDefault();
-            EntryHandler.toggleBookmark(event.target);
-        });
-
-        mouseHandler.onClick("a[data-toggle-status]", (event) => {
-            event.preventDefault();
-
-            let currentItem = DomHelper.findParent(event.target, "item");
-            if (currentItem) {
-                EntryHandler.toggleEntryStatus(currentItem);
-            }
-        });
-
-        mouseHandler.onClick("a[data-fetch-content-entry]", (event) => {
-            event.preventDefault();
-            EntryHandler.fetchOriginalContent(event.target);
-        });
-
-        mouseHandler.onClick("button[data-on-click=addToFilter]", (event) => {
-            event.preventDefault();
-            let inputs = document.querySelectorAll("#keyword");
-            if (inputs && inputs.length > 0) {
-                let newWord = inputs[0].value;
-                FiltersHandler.addToFilter(newWord);
-                inputs[0].value = "";
-                inputs[0].focus();
-            }
-        });
-
-        mouseHandler.onClick("div[data-on-click=rmFromFilter]", (event) => {
-            event.stopPropagation();
-            FiltersHandler.rmFromFilter(event.target.parentNode);
-        });
+        let mediaHandler = new TabHandler("media", 0);
+        mediaHandler.LoadTab();
+        let officialHandler = new TabHandler("official", 0);
+        officialHandler.LoadTab();
 
     });
 

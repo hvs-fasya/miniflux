@@ -82,6 +82,22 @@ func (s *Storage) CategoryByTitle(userID int64, title string) (*model.Category, 
 	return &category, nil
 }
 
+// CategoryByTitleWOUserID finds a category by the title.
+func (s *Storage) CategoryByTitleWOUserID(title string) (*model.Category, error) {
+	defer timer.ExecutionTime(time.Now(), fmt.Sprintf("[Storage:CategoryByTitleWOUserID] title=%s", title))
+	var category model.Category
+
+	query := `SELECT id, title FROM categories WHERE title=$1`
+	err := s.db.QueryRow(query, title).Scan(&category.ID, &category.Title)
+	if err == sql.ErrNoRows {
+		return nil, nil
+	} else if err != nil {
+		return nil, fmt.Errorf("Unable to fetch category: %v", err)
+	}
+
+	return &category, nil
+}
+
 // Categories returns all categories that belongs to the given user.
 func (s *Storage) Categories(userID int64) (model.Categories, error) {
 	defer timer.ExecutionTime(time.Now(), fmt.Sprintf("[Storage:Categories] userID=%d", userID))

@@ -20,6 +20,10 @@ html, body {
   padding: 0;
 }
 
+.mdl-dialog {
+  width: 70%;
+}
+
 .ticker {
   background-color: #673ab7;
   color: white;
