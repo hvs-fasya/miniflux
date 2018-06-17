@@ -2,7 +2,9 @@
 
     <br>
     {{ if eq .countrytotal 0 }}
-    <p>No recent news</p>
+    <div class="mdl-grid boxes-center">
+    <h4>No recent news</h4>
+    </div>
     {{ end }}
 {{ range $i, $e := .mediaentries }}
 
