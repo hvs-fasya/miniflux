@@ -256,16 +256,21 @@
 
     class TabHandler {
 
-        constructor(tabname, offset) {
+        constructor(tabname, offset, country="WORLDWIDE") {
             this.tabname = tabname;
             this.offset = offset;
             this.limit = 10;
+            this.country = "";
             this.PrevButton = null;
             this.NextButton = null;
         }
 
-        LoadTab(){
+        async LoadTab(){
             let tab = document.getElementById(this.tabname);
+            while(!document.querySelector("li.selected")) {
+                await new Promise(r => setTimeout(r, 300));
+            }
+            this.country = document.querySelector("li.selected").textContent.trim();
             let xhr = new XMLHttpRequest();
             xhr.onreadystatechange = function() {
                 if (xhr.readyState == 4 && xhr.status == 200) {
@@ -278,7 +283,7 @@
                     this.ListenDownloads();
                 }
             }.bind( this );
-            xhr.open("GET", "/news/" + this.tabname + "?offset=" + this.offset + "&limit=" + this.limit, true);
+            xhr.open("GET", "/news/" + this.tabname + "?offset=" + this.offset + "&limit=" + this.limit + "&country=" + this.country, true);
             try {
                 xhr.send();
             } catch (err) {
@@ -344,6 +349,15 @@
         mediaHandler.LoadTab();
         let officialHandler = new TabHandler("official", 0);
         officialHandler.LoadTab();
+
+        let countries = document.querySelector("ul[for=worldwide]");
+        countries.addEventListener("click", function(e){
+            let country = e.target.textContent.trim();
+            mediaHandler = new TabHandler("media", 0, country);
+            mediaHandler.LoadTab();
+            officialHandler = new TabHandler("official", 0, country);
+            officialHandler.LoadTab();
+        })
 
     });
 

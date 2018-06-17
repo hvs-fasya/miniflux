@@ -21,6 +21,7 @@ type NewsEntryQueryBuilder struct {
 	store              *Storage
 	feedID             int64
 	categoryID         int64
+	notCategoryIDs     []int64
 	status             string
 	notStatus          string
 	order              string
@@ -74,6 +75,12 @@ func (e *NewsEntryQueryBuilder) WithFeedID(feedID int64) *NewsEntryQueryBuilder 
 // WithCategoryID set the categoryID.
 func (e *NewsEntryQueryBuilder) WithCategoryID(categoryID int64) *NewsEntryQueryBuilder {
 	e.categoryID = categoryID
+	return e
+}
+
+// WithoutCategoryIDs set the categoryIDs excluded.
+func (e *NewsEntryQueryBuilder) WithoutCategoryIDs(categoryIDs []int64) *NewsEntryQueryBuilder {
+	e.notCategoryIDs = categoryIDs
 	return e
 }
 
@@ -285,6 +292,13 @@ func (e *NewsEntryQueryBuilder) buildCondition() ([]interface{}, string) {
 	if e.categoryID != 0 {
 		conditions = append(conditions, fmt.Sprintf("f.category_id=$%d", len(args)+1))
 		args = append(args, e.categoryID)
+	}
+
+	if len(e.notCategoryIDs) > 0 {
+		for _, id := range e.notCategoryIDs {
+			conditions = append(conditions, fmt.Sprintf("f.category_id != $%d", len(args)+1))
+			args = append(args, id)
+		}
 	}
 
 	if e.feedID != 0 {
