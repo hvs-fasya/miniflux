@@ -50,10 +50,14 @@ func (c *Controller) Official(w http.ResponseWriter, r *http.Request) {
 	officialBuilder.WithoutStatus(model.EntryStatusRemoved)
 	officialBuilder.WithOrder(model.DefaultSortingOrder)
 	officialBuilder.WithDirection(DefaultSortingDirection)
+	var cat_ids []int64
 	officialBuilder.WithOffset(offset)
 	if country != DefaultCountry {
+
 		for _, suff := range CategoriesSuffixes {
 			if cat, err := c.store.CategoryByTitleWOUserID(country + suff); err == nil && cat != nil {
+				logger.Debug("category id: ", cat.ID)
+				cat_ids = append(cat_ids, cat.ID)
 				officialBuilder.WithCategoryID(cat.ID)
 			}
 		}
@@ -75,6 +79,10 @@ func (c *Controller) Official(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		html.ServerError(w, err)
 		return
+	}
+	if country != DefaultCountry && len(cat_ids) == 0 {
+		officialCount = 0
+		officialEntries = nil
 	}
 
 	view.Set("officialentries", officialEntries)
