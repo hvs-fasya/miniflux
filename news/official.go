@@ -37,7 +37,6 @@ func (c *Controller) Official(w http.ResponseWriter, r *http.Request) {
 	offset := request.QueryIntParam(r, "offset", 0)
 	limit := request.QueryIntParam(r, "limit", NewsEntriesLimit)
 	country := request.QueryParam(r, "country", DefaultCountry)
-	logger.Debug("country: %s", country)
 
 	//official tab
 	var excludeCategoryIDs []int64

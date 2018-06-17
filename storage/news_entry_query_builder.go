@@ -22,6 +22,8 @@ type NewsEntryQueryBuilder struct {
 	feedID             int64
 	categoryID         int64
 	notCategoryIDs     []int64
+	country            string
+	nocountry          string
 	status             string
 	notStatus          string
 	order              string
@@ -81,6 +83,18 @@ func (e *NewsEntryQueryBuilder) WithCategoryID(categoryID int64) *NewsEntryQuery
 // WithoutCategoryIDs set the categoryIDs excluded.
 func (e *NewsEntryQueryBuilder) WithoutCategoryIDs(categoryIDs []int64) *NewsEntryQueryBuilder {
 	e.notCategoryIDs = categoryIDs
+	return e
+}
+
+// WithCountry set the country
+func (e *NewsEntryQueryBuilder) WithCountry(country string) *NewsEntryQueryBuilder {
+	e.country = country
+	return e
+}
+
+// WithoutCountry set the country
+func (e *NewsEntryQueryBuilder) WithoutCountry(country string) *NewsEntryQueryBuilder {
+	e.nocountry = country
 	return e
 }
 
@@ -299,6 +313,16 @@ func (e *NewsEntryQueryBuilder) buildCondition() ([]interface{}, string) {
 			conditions = append(conditions, fmt.Sprintf("f.category_id != $%d", len(args)+1))
 			args = append(args, id)
 		}
+	}
+
+	if e.country != "" {
+		conditions = append(conditions, fmt.Sprintf("e.title SIMILAR TO '%%(' || $%d || ')%%'", len(args)+1))
+		args = append(args, e.country)
+	}
+
+	if e.nocountry != "" {
+		conditions = append(conditions, fmt.Sprintf("e.title NOT SIMILAR TO '%%(' || $%d || ')%%'", len(args)+1))
+		args = append(args, e.nocountry)
 	}
 
 	if e.feedID != 0 {

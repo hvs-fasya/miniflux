@@ -1,7 +1,11 @@
 {{ define "news_media"}}
 
     <br>
+    {{ if eq .countrytotal 0 }}
+    <p>No recent news</p>
+    {{ end }}
 {{ range $i, $e := .mediaentries }}
+
 {{ if eq $i 2 }}
     <div class="mdl-grid boxes-center">
         <div class="demo-card-square mdl-card mdl-shadow--2dp mdl-cell mdl-cell--6-col">

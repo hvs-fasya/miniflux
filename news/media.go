@@ -1,15 +1,13 @@
 package news
 
 import (
-	"net/http"
-	"time"
-
 	"github.com/miniflux/miniflux/http/context"
 	"github.com/miniflux/miniflux/http/request"
 	"github.com/miniflux/miniflux/http/response/html"
 	"github.com/miniflux/miniflux/model"
 	"github.com/miniflux/miniflux/ui/session"
 	"github.com/miniflux/miniflux/ui/view"
+	"net/http"
 )
 
 const (
@@ -25,38 +23,83 @@ func (c *Controller) Media(w http.ResponseWriter, r *http.Request) {
 	view := view.New(c.tpl, ctx, sess)
 	offset := request.QueryIntParam(r, "offset", 0)
 	limit := request.QueryIntParam(r, "limit", NewsEntriesLimit)
+	country := request.QueryParam(r, "country", DefaultCountry)
 
 	//media tab
 	mediaCategory, err := c.store.CategoryByTitleWOUserID(MediaNewsCategoryTitle)
 	mediaCategoryID := mediaCategory.ID
-	mediaBuilder := c.store.NewNewsEntryQueryBuilder()
-	mediaBuilder.WithoutStatus(model.EntryStatusRemoved)
-	mediaBuilder.WithOrder(model.DefaultSortingOrder)
-	mediaBuilder.WithDirection(DefaultSortingDirection)
-	mediaBuilder.WithOffset(offset)
-	mediaBuilder.WithCategoryID(mediaCategoryID)
-	mediaBuilder.WithLimit(limit)
 
-	mediaStartDate := time.Now().AddDate(0, -1, 0)
-	mediaBuilder.After(&mediaStartDate)
+	countryBuilder := c.store.NewNewsEntryQueryBuilder()
+	countryBuilder.WithoutStatus(model.EntryStatusRemoved)
+	countryBuilder.WithOrder(model.DefaultSortingOrder)
+	countryBuilder.WithDirection(DefaultSortingDirection)
 
-	mediaEntries, err := mediaBuilder.GetEntries()
+	countryBuilder.WithOffset(offset)
+	countryBuilder.WithCategoryID(mediaCategoryID)
+	countryBuilder.WithLimit(limit)
+	if country != DefaultCountry {
+		countryBuilder.WithCountry(country)
+	}
+
+	countryEntries, err := countryBuilder.GetEntries()
 	if err != nil {
 		html.ServerError(w, err)
 		return
 	}
-	mediaCount, err := mediaBuilder.CountEntries()
+	countryCount, err := countryBuilder.CountEntries()
 	if err != nil {
 		html.ServerError(w, err)
 		return
 	}
+	var allOffset int
+	if offset == 0 {
+		allOffset = 0
+	} else {
+		allOffset = offset - countryCount - 1
+	}
+
+	mediaEntries := countryEntries
+	var allCount int
+
+	if country != DefaultCountry && len(countryEntries) < limit {
+		mediaBuilder := c.store.NewNewsEntryQueryBuilder()
+		mediaBuilder.WithLimit(limit - len(countryEntries))
+		mediaBuilder.WithCategoryID(mediaCategoryID)
+		mediaBuilder.WithOffset(allOffset)
+		mediaBuilder.WithDirection(DefaultSortingDirection)
+		mediaBuilder.WithOrder(model.DefaultSortingOrder)
+		mediaBuilder.WithoutStatus(model.EntryStatusRemoved)
+		mediaBuilder.WithoutCountry(country)
+		allEntries, err := mediaBuilder.GetEntries()
+		if err != nil {
+			html.ServerError(w, err)
+			return
+		}
+		mediaEntries = append(mediaEntries, allEntries...)
+		allCount, err = mediaBuilder.CountEntries()
+		if err != nil {
+			html.ServerError(w, err)
+			return
+		}
+	}
+
+	//mediaStartDate := time.Now().AddDate(0, -1, 0)
+	//mediaBuilder.After(&mediaStartDate)
+
+	//mediaCount, err := mediaBuilder.CountEntries()
+	//if err != nil {
+	//	html.ServerError(w, err)
+	//	return
+	//}
+
 	view.Set("mediaentries", mediaEntries)
-	view.Set("mediatotal", mediaCount)
+	view.Set("countrytotal", len(countryEntries))
+	view.Set("mediatotal", allCount+countryCount)
 	view.Set("offset", offset)
 	view.Set("limit", NewsEntriesLimit)
 
 	var hasNext bool
-	hasNext = (mediaCount - offset) > limit
+	hasNext = (allCount + countryCount - offset) > limit
 	view.Set("hasNext", hasNext)
 
 	html.OK(w, view.NewsAjaxRender("news_media"))
