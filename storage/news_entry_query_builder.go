@@ -179,8 +179,8 @@ func (e *NewsEntryQueryBuilder) GetEntry() (*model.Entry, error) {
 
 // GetEntries returns a list of entries that match the condition.
 func (e *NewsEntryQueryBuilder) GetEntries() (model.Entries, error) {
-	debugStr := "[NewsEntryQueryBuilder:GetEntries] feedID=%d, categoryID=%d, status=%s, order=%s, direction=%s, offset=%d, limit=%d"
-	defer timer.ExecutionTime(time.Now(), fmt.Sprintf(debugStr, e.feedID, e.categoryID, e.status, e.order, e.direction, e.offset, e.limit))
+	debugStr := "[NewsEntryQueryBuilder:GetEntries] feedID=%d, categoryID=%d, status=%s, order=%s, direction=%s, offset=%d, limit=%d, filter=%s"
+	defer timer.ExecutionTime(time.Now(), fmt.Sprintf(debugStr, e.feedID, e.categoryID, e.status, e.order, e.direction, e.offset, e.limit, e.filter))
 
 	query := `
 		SELECT

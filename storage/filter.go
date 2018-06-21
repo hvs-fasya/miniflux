@@ -43,6 +43,22 @@ func (s *Storage) FilterByName(userID int64, name string) (*model.Filter, error)
 	return &filter, nil
 }
 
+// FilterByNameWOUserID finds a filter by the name.
+func (s *Storage) FilterByNameWOUserID(name string) (*model.Filter, error) {
+	defer timer.ExecutionTime(time.Now(), fmt.Sprintf("[Storage:FilterByName] name=%s", name))
+	var filter model.Filter
+	var pg_filters string
+	query := `SELECT id, filter_name, filters FROM filters WHERE filter_name=$1`
+	err := s.db.QueryRow(query, name).Scan(&filter.ID, &filter.FilterName, &pg_filters)
+	if err == sql.ErrNoRows {
+		return nil, nil
+	} else if err != nil {
+		return nil, fmt.Errorf("Unable to fetch filter: %v", err)
+	}
+	filter.Filters = strings.Split(pg_filters, ",")
+	return &filter, nil
+}
+
 // Filters returns all Filters that belongs to the given user.
 func (s *Storage) Filters(userID int64) (model.Filters, error) {
 	defer timer.ExecutionTime(time.Now(), fmt.Sprintf("[Storage:Filters] userID=%d", userID))
