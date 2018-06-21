@@ -8,6 +8,7 @@ import (
 	"github.com/miniflux/miniflux/ui/session"
 	"github.com/miniflux/miniflux/ui/view"
 	"net/http"
+	"time"
 )
 
 const (
@@ -41,6 +42,9 @@ func (c *Controller) Media(w http.ResponseWriter, r *http.Request) {
 		countryBuilder.WithCountry(country)
 	}
 
+	countryStartDate := time.Now().AddDate(0, -1, 0)
+	countryBuilder.After(&countryStartDate)
+
 	countryEntries, err := countryBuilder.GetEntries()
 	if err != nil {
 		html.ServerError(w, err)
@@ -70,6 +74,10 @@ func (c *Controller) Media(w http.ResponseWriter, r *http.Request) {
 		mediaBuilder.WithOrder(model.DefaultSortingOrder)
 		mediaBuilder.WithoutStatus(model.EntryStatusRemoved)
 		mediaBuilder.WithoutCountry(country)
+
+		mediaStartDate := time.Now().AddDate(0, -1, 0)
+		mediaBuilder.After(&mediaStartDate)
+
 		allEntries, err := mediaBuilder.GetEntries()
 		if err != nil {
 			html.ServerError(w, err)
