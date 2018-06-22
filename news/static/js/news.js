@@ -349,6 +349,8 @@
         mediaHandler.LoadTab();
         let officialHandler = new TabHandler("official", 0);
         officialHandler.LoadTab();
+        let visaHandler = new TabHandler("visa", 0);
+        visaHandler.LoadTab();
 
         let countries = document.querySelector("ul[for=worldwide]");
         countries.addEventListener("click", function(e){
@@ -357,6 +359,8 @@
             mediaHandler.LoadTab();
             officialHandler = new TabHandler("official", 0, country);
             officialHandler.LoadTab();
+            visaHandler = new TabHandler("visa", 0, country);
+            visaHandler.LoadTab();
         })
 
     });
