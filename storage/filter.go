@@ -15,15 +15,15 @@ import (
 func (s *Storage) Filter(userID, filterID int64) (*model.Filter, error) {
 	defer timer.ExecutionTime(time.Now(), fmt.Sprintf("[Storage:Filter] userID=%d, getFilter=%d", userID, filterID))
 	var filter model.Filter
-	var pg_filters string
+	var pgFilters string
 	query := `SELECT id, user_id, filter_name, filters FROM filters WHERE user_id=$1 AND id=$2`
-	err := s.db.QueryRow(query, userID, filterID).Scan(&filter.ID, &filter.UserID, &filter.FilterName, &pg_filters)
+	err := s.db.QueryRow(query, userID, filterID).Scan(&filter.ID, &filter.UserID, &filter.FilterName, &pgFilters)
 	if err == sql.ErrNoRows {
 		return nil, nil
 	} else if err != nil {
 		return nil, fmt.Errorf("unable to fetch filter: %v", err)
 	}
-	filter.Filters = strings.Split(pg_filters, ",")
+	filter.Filters = strings.Split(pgFilters, ",")
 	return &filter, nil
 }
 
@@ -31,15 +31,15 @@ func (s *Storage) Filter(userID, filterID int64) (*model.Filter, error) {
 func (s *Storage) FilterByName(userID int64, name string) (*model.Filter, error) {
 	defer timer.ExecutionTime(time.Now(), fmt.Sprintf("[Storage:FilterByName] userID=%d, name=%s", userID, name))
 	var filter model.Filter
-	var pg_filters string
-	query := `SELECT id, user_id, filter_name, filters FROM filters WHERE user_id=$1 AND filter_name=$2`
-	err := s.db.QueryRow(query, userID, name).Scan(&filter.ID, &filter.UserID, &filter.FilterName, &pg_filters)
+	var pgFilters string
+	query := `SELECT id, user_id, filter_name, array_to_string(filters,',') FROM filters WHERE user_id=$1 AND filter_name=$2`
+	err := s.db.QueryRow(query, userID, name).Scan(&filter.ID, &filter.UserID, &filter.FilterName, &pgFilters)
 	if err == sql.ErrNoRows {
 		return nil, nil
 	} else if err != nil {
 		return nil, fmt.Errorf("Unable to fetch filter: %v", err)
 	}
-	filter.Filters = strings.Split(pg_filters, ",")
+	filter.Filters = strings.Split(pgFilters, ",")
 	return &filter, nil
 }
 
@@ -47,15 +47,15 @@ func (s *Storage) FilterByName(userID int64, name string) (*model.Filter, error)
 func (s *Storage) FilterByNameWOUserID(name string) (*model.Filter, error) {
 	defer timer.ExecutionTime(time.Now(), fmt.Sprintf("[Storage:FilterByName] name=%s", name))
 	var filter model.Filter
-	var pg_filters string
-	query := `SELECT id, filter_name, filters FROM filters WHERE filter_name=$1`
-	err := s.db.QueryRow(query, name).Scan(&filter.ID, &filter.FilterName, &pg_filters)
+	var pgFilters string
+	query := `SELECT id, filter_name, array_to_string(filters,',') FROM filters WHERE filter_name=$1`
+	err := s.db.QueryRow(query, name).Scan(&filter.ID, &filter.FilterName, &pgFilters)
 	if err == sql.ErrNoRows {
 		return nil, nil
 	} else if err != nil {
 		return nil, fmt.Errorf("Unable to fetch filter: %v", err)
 	}
-	filter.Filters = strings.Split(pg_filters, ",")
+	filter.Filters = strings.Split(pgFilters, ",")
 	return &filter, nil
 }
 
@@ -71,13 +71,13 @@ func (s *Storage) Filters(userID int64) (model.Filters, error) {
 	defer rows.Close()
 
 	filters := make(model.Filters, 0)
-	var pg_filters string
+	var pgFilters string
 	for rows.Next() {
 		var filter model.Filter
-		if err := rows.Scan(&filter.ID, &filter.UserID, &filter.FilterName, &pg_filters); err != nil {
+		if err := rows.Scan(&filter.ID, &filter.UserID, &filter.FilterName, &pgFilters); err != nil {
 			return nil, fmt.Errorf("Unable to fetch filters row: %v", err)
 		}
-		filter.Filters = strings.Split(pg_filters, ",")
+		filter.Filters = strings.Split(pgFilters, ",")
 		filters = append(filters, filter)
 	}
 
