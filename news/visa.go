@@ -7,10 +7,10 @@ import (
 	"github.com/miniflux/miniflux/http/context"
 	"github.com/miniflux/miniflux/http/request"
 	"github.com/miniflux/miniflux/http/response/html"
+	"github.com/miniflux/miniflux/logger"
 	"github.com/miniflux/miniflux/model"
 	"github.com/miniflux/miniflux/ui/session"
 	"github.com/miniflux/miniflux/ui/view"
-	"github.com/miniflux/miniflux/logger"
 )
 
 const (
@@ -43,16 +43,16 @@ func (c *Controller) Visa(w http.ResponseWriter, r *http.Request) {
 	visaStartDate := time.Now().AddDate(0, -1, 0)
 	visaBuilder.After(&visaStartDate)
 
-		visaEntries, err := visaBuilder.GetEntries()
-		if err != nil {
-			html.ServerError(w, err)
-			return
-		}
-		visaCount, err := visaBuilder.CountEntries()
-		if err != nil {
-			html.ServerError(w, err)
-			return
-		}
+	visaEntries, err := visaBuilder.GetEntries()
+	if err != nil {
+		html.ServerError(w, err)
+		return
+	}
+	visaCount, err := visaBuilder.CountEntries()
+	if err != nil {
+		html.ServerError(w, err)
+		return
+	}
 
 	v.Set("visaentries", visaEntries)
 	v.Set("visatotal", visaCount)

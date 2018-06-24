@@ -98,7 +98,11 @@ func (e *Engine) NewsRender(name, language string, data interface{}) []byte {
 	lang := e.translator.GetLanguage(language)
 	tpl.Funcs(template.FuncMap{
 		"elapsed": func(timezone string, t time.Time) string {
-			return elapsedTime(lang, timezone, t)
+			elapsed := elapsedTime(lang, timezone, t)
+			if elapsed == NotYet {
+				return ""
+			}
+			return elapsed
 		},
 		"t": func(key interface{}, args ...interface{}) string {
 			switch key.(type) {
@@ -138,7 +142,11 @@ func (e *Engine) NewsAjaxRender(name, language string, data interface{}) []byte 
 	lang := e.translator.GetLanguage(language)
 	tpl.Funcs(template.FuncMap{
 		"elapsed": func(timezone string, t time.Time) string {
-			return elapsedTime(lang, timezone, t)
+			elapsed := elapsedTime(lang, timezone, t)
+			if elapsed == NotYet {
+				return ""
+			}
+			return elapsed
 		},
 		"t": func(key interface{}, args ...interface{}) string {
 			switch key.(type) {
