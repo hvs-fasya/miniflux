@@ -1,0 +1,9 @@
+{{ define "news_security"}}
+
+<br>
+<section class="section--center mdl-grid mdl-grid--no-spacing mdl-shadow--2dp">
+    <p> {{ .country }}</p>
+    <div>{{noescape (proxyFilter .doc) }}</div>
+</section>
+
+{{ end }}
