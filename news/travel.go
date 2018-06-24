@@ -13,12 +13,11 @@ import (
 )
 
 const (
-	MediaNewsCategoryTitle = "Media News"
-	NewsEntriesLimit       = 10
+	TravelNewsCategoryTitle = "Travel Alerts"
 )
 
-// Media shows the Media template
-func (c *Controller) Media(w http.ResponseWriter, r *http.Request) {
+// Travel shows the Travel template
+func (c *Controller) Travel(w http.ResponseWriter, r *http.Request) {
 	ctx := context.New(r)
 
 	sess := session.New(c.store, ctx)
@@ -27,9 +26,9 @@ func (c *Controller) Media(w http.ResponseWriter, r *http.Request) {
 	limit := request.QueryIntParam(r, "limit", NewsEntriesLimit)
 	country := request.QueryParam(r, "country", DefaultCountry)
 
-	//media tab
-	mediaCategory, err := c.store.CategoryByTitleWOUserID(MediaNewsCategoryTitle)
-	mediaCategoryID := mediaCategory.ID
+	//travel tab
+	travelCategory, err := c.store.CategoryByTitleWOUserID(TravelNewsCategoryTitle)
+	travelCategoryID := travelCategory.ID
 
 	countryBuilder := c.store.NewNewsEntryQueryBuilder()
 	countryBuilder.WithoutStatus(model.EntryStatusRemoved)
@@ -37,13 +36,13 @@ func (c *Controller) Media(w http.ResponseWriter, r *http.Request) {
 	countryBuilder.WithDirection(DefaultSortingDirection)
 
 	countryBuilder.WithOffset(offset)
-	countryBuilder.WithCategoryID(mediaCategoryID)
+	countryBuilder.WithCategoryID(travelCategoryID)
 	countryBuilder.WithLimit(limit)
 	if country != DefaultCountry {
 		countryBuilder.WithCountry(country)
 	}
 
-	countryStartDate := time.Now().AddDate(0, -1, 0)
+	countryStartDate := time.Now().AddDate(0, -3, 0)
 	countryBuilder.After(&countryStartDate)
 
 	countryEntries, err := countryBuilder.GetEntries()
@@ -63,38 +62,38 @@ func (c *Controller) Media(w http.ResponseWriter, r *http.Request) {
 		allOffset = offset - countryCount - 1
 	}
 
-	mediaEntries := countryEntries
+	travelEntries := countryEntries
 	var allCount int
 
 	if country != DefaultCountry && len(countryEntries) < limit {
-		mediaBuilder := c.store.NewNewsEntryQueryBuilder()
-		mediaBuilder.WithLimit(limit - len(countryEntries))
-		mediaBuilder.WithCategoryID(mediaCategoryID)
-		mediaBuilder.WithOffset(allOffset)
-		mediaBuilder.WithDirection(DefaultSortingDirection)
-		mediaBuilder.WithOrder(model.DefaultSortingOrder)
-		mediaBuilder.WithoutStatus(model.EntryStatusRemoved)
-		mediaBuilder.WithoutCountry(country)
+		travelBuilder := c.store.NewNewsEntryQueryBuilder()
+		travelBuilder.WithLimit(limit - len(countryEntries))
+		travelBuilder.WithCategoryID(travelCategoryID)
+		travelBuilder.WithOffset(allOffset)
+		travelBuilder.WithDirection(DefaultSortingDirection)
+		travelBuilder.WithOrder(model.DefaultSortingOrder)
+		travelBuilder.WithoutStatus(model.EntryStatusRemoved)
+		travelBuilder.WithoutCountry(country)
 
-		mediaStartDate := time.Now().AddDate(0, -1, 0)
-		mediaBuilder.After(&mediaStartDate)
+		travelStartDate := time.Now().AddDate(0, -3, 0)
+		travelBuilder.After(&travelStartDate)
 
-		allEntries, err := mediaBuilder.GetEntries()
+		allEntries, err := travelBuilder.GetEntries()
 		if err != nil {
 			html.ServerError(w, err)
 			return
 		}
-		mediaEntries = append(mediaEntries, allEntries...)
-		allCount, err = mediaBuilder.CountEntries()
+		travelEntries = append(travelEntries, allEntries...)
+		allCount, err = travelBuilder.CountEntries()
 		if err != nil {
 			html.ServerError(w, err)
 			return
 		}
 	}
 
-	view.Set("mediaentries", mediaEntries)
+	view.Set("travelentries", travelEntries)
 	view.Set("countrytotal", len(countryEntries))
-	view.Set("mediatotal", allCount+countryCount)
+	view.Set("traveltotal", allCount+countryCount)
 	view.Set("offset", offset)
 	view.Set("limit", NewsEntriesLimit)
 
@@ -102,5 +101,5 @@ func (c *Controller) Media(w http.ResponseWriter, r *http.Request) {
 	hasNext = (allCount + countryCount - offset) > limit
 	view.Set("hasNext", hasNext)
 
-	html.OK(w, view.NewsAjaxRender("news_media"))
+	html.OK(w, view.NewsAjaxRender("news_travel"))
 }

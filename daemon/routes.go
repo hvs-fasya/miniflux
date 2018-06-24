@@ -60,6 +60,7 @@ func routes(cfg *config.Config, store *storage.Storage, feedHandler *feed.Handle
 	newsRouter.HandleFunc("/manifest.json", newsController.WebManifest).Name("webManifest").Methods("GET")
 	newsRouter.HandleFunc("/", newsController.Home).Name("home").Methods("GET")
 	newsRouter.HandleFunc("/media", newsController.Media).Name("news_media").Methods("GET")
+	newsRouter.HandleFunc("/travel", newsController.Travel).Name("news_travel").Methods("GET")
 	newsRouter.HandleFunc("/official", newsController.Official).Name("news_official").Methods("GET")
 	newsRouter.HandleFunc("/visa", newsController.Visa).Name("news_visa").Methods("GET")
 	newsRouter.HandleFunc("/sources", newsController.Sources).Name("sources").Methods("GET")
