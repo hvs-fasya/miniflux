@@ -2,6 +2,7 @@ package news
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/miniflux/miniflux/http/context"
@@ -11,7 +12,15 @@ import (
 	"github.com/miniflux/miniflux/reader/scraper"
 	"github.com/miniflux/miniflux/ui/session"
 	"github.com/miniflux/miniflux/ui/view"
-	"strings"
+)
+
+var (
+	tabs = []string{
+		"risk",
+		"security",
+		"laws",
+		"disasters",
+	}
 )
 
 // Security shows the Security template
@@ -29,7 +38,7 @@ func (c *Controller) Security(w http.ResponseWriter, r *http.Request) {
 		html.ServerError(w, err)
 		return
 	}
-	doc, err = proceedDoc(doc)
+	cards, err := proceedDoc(doc)
 	if err != nil {
 		logger.Debug("error: %s", err)
 		html.ServerError(w, err)
@@ -37,41 +46,30 @@ func (c *Controller) Security(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//security tab
-	v.Set("country", country)
-	v.Set("doc", doc)
+	for _, tab := range tabs {
+		v.Set(tab, cards[tab])
+	}
 
 	html.OK(w, v.NewsAjaxRender("news_security"))
 }
 
-func proceedDoc(doc string) (string, error) {
+func proceedDoc(doc string) (map[string]string, error) {
 	var err error
+	proceeded := make(map[string]string)
 	reader := strings.NewReader(doc)
 
 	document, err := goquery.NewDocumentFromReader(reader)
 	if err != nil {
-		return "", err
+		return proceeded, err
+	}
+	for _, tab := range tabs {
+		proceeded[tab], err = getDetail(document, tab)
+		if err != nil {
+			return proceeded, err
+		}
 	}
 
-	document, err = removeExtraTabs(document)
-	if err != nil {
-		return "", err
-	}
-
-	proceeded, err := document.Html()
-	if err != nil {
-		return "", err
-	}
 	return proceeded, nil
-}
-
-func removeExtraTabs(document *goquery.Document) (*goquery.Document, error) {
-
-	document.Find("details[id=entryexit],details[id=health],details[id=assistance]").Each(func(i int, s *goquery.Selection) {
-		removeNodes(s)
-	})
-	logger.Debug("doc: %+v", document)
-
-	return document, nil
 }
 
 func removeNodes(s *goquery.Selection) {
@@ -81,4 +79,16 @@ func removeNodes(s *goquery.Selection) {
 			parent.Get(0).RemoveChild(s.Get(0))
 		}
 	})
+}
+
+func getDetail(doc *goquery.Document, name string) (string, error) {
+	selection := doc.Find("details[id=" + name + "]")
+	selection.Each(func(i int, s *goquery.Selection) {
+		removeNodes(s)
+	})
+	stringified, err := selection.Html()
+	if err != nil {
+		return "", err
+	}
+	return stringified, nil
 }
