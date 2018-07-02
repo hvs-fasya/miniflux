@@ -65,6 +65,7 @@
             z-index: 900;
         }
     </style>
+    <script src="https://app.brandquiz.io/embed"></script>
 </head>
 <body class="mdl-demo mdl-color--grey-100 mdl-color-text--grey-700 mdl-base">
 <!-- DATA SOURCES DIALOG -->
@@ -79,20 +80,17 @@
 </dialog>
 <!-- CONTACTS DIALOG -->
 <dialog class="mdl-dialog" id="contactsContent">
-    <h4 class="mdl-dialog__title">Contacts</h4>
     <div class="mdl-dialog__content">
-        <p>
-            Here should be the Contacts
-            Here should be the Contacts
-            Here should be the Contacts
-            Here should be the Contacts
-            Here should be the Contacts
-            Here should be the Contacts
-            Here should be the Contacts
-            Here should be the Contacts
-            Here should be the Contacts
-            Here should be the Contacts
-        </p>
+        <div class="brandquiz_embed" data-embed="visadbio/news-contact"></div>
+    </div>
+    <div class="mdl-dialog__actions">
+        <button type="button" class="mdl-button close">Close</button>
+    </div>
+</dialog>
+<!-- SUBSCRIBE DIALOG -->
+<dialog class="mdl-dialog" id="subscribeContent">
+    <div class="mdl-dialog__content">
+    <div class="brandquiz_embed" data-embed="visadbio/visadb-news-signup"></div>
     </div>
     <div class="mdl-dialog__actions">
         <button type="button" class="mdl-button close">Close</button>
@@ -120,15 +118,15 @@
                     <nav class="mdl-navigation">
                         <a role="button" class="mdl-navigation__link--transparent" href="http://visadb.io" target="_blank">SEARCH VISA</a>
                         <a role="button" class="mdl-navigation__link--transparent" href="#" id="show-sources">DATA SOURCES</a>
-                        <a role="button" class="mdl-navigation__link--transparent" href="#">SUBSCRIBE</a>
-                        <form action="#" id="subscribe-header">
-                            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                                <input class="mdl-textfield__input" type="text" id="subscribe" required>
-                                <label class="mdl-textfield__label" for="subscribe">Your Email...</label>
-                            </div>
-                            <input type="submit" form="subscribe-header" class="mdl-button mdl-js-button mdl-js-ripple-effect" value="OK">
+                        <a role="button" id="show-subscribe" class="mdl-navigation__link--transparent" href="#">SUBSCRIBE</a>
+                        {{/*<form action="#" id="subscribe-header">*/}}
+                            {{/*<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">*/}}
+                                {{/*<input class="mdl-textfield__input" type="text" id="subscribe" required>*/}}
+                                {{/*<label class="mdl-textfield__label" for="subscribe">Your Email...</label>*/}}
+                            {{/*</div>*/}}
+                            {{/*<input type="submit" form="subscribe-header" class="mdl-button mdl-js-button mdl-js-ripple-effect" value="OK">*/}}
                         {{/*<button type="submit" form="subscribe-header" class="mdl-button mdl-js-button mdl-js-ripple-effect">OK</button>*/}}
-                        </form>
+                        {{/*</form>*/}}
                         <a role="button" id="show-contacts" class="mdl-navigation__link--transparent" href="#">CONTACTS</a>
                     </nav>
 
@@ -194,6 +192,18 @@
             });
             dialog.querySelector('.close').addEventListener('click', function() {
                 dialog.close();
+            });
+
+            var subscribe = document.querySelector('#subscribeContent');
+            var showSubscribeButton = document.querySelector('#show-subscribe');
+            if (! subscribe.showModal) {
+                dialogPolyfill.registerDialog(subscribe);
+            }
+            showSubscribeButton.addEventListener('click', function() {
+                subscribe.showModal();
+            });
+            subscribe.querySelector('.close').addEventListener('click', function() {
+                subscribe.close();
             });
 
             var sources = document.querySelector('#sourcesContent');
