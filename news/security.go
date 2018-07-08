@@ -75,6 +75,7 @@ func (c *Controller) Security(w http.ResponseWriter, r *http.Request) {
 		})
 
 	})
+	data["CAN"] = OutputCountry{"NormalPrecautions", "Exercise normal security precautions"}
 	js, _ := json.Marshal(data)
 
 	//dataStr := `{
