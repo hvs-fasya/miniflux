@@ -1,94 +1,91 @@
 package news
 
 import (
-	"net/http"
-	"strings"
-
 	"github.com/PuerkitoBio/goquery"
-	"github.com/miniflux/miniflux/http/context"
-	"github.com/miniflux/miniflux/http/request"
+	"net/http"
+
+	"encoding/json"
+	"fmt"
 	"github.com/miniflux/miniflux/http/response/html"
 	"github.com/miniflux/miniflux/logger"
-	"github.com/miniflux/miniflux/reader/scraper"
-	"github.com/miniflux/miniflux/ui/session"
-	"github.com/miniflux/miniflux/ui/view"
+	"io/ioutil"
 )
 
 var (
-	tabs = []string{
-		"risk",
-		"security",
-		"laws",
-		"disasters",
+	levels = map[string]string{
+		"Exercise normal security precautions":                            "NormalPrecautions",
+		"Exercise normal security precautions (with regional advisories)": "NormalPrecautionsReg",
+		"Exercise a high degree of caution":                               "HighCaution",
+		"Exercise a high degree of caution (with regional advisories)":    "HighCautionReg",
+		"Avoid non-essential travel":                                      "AvoidNonEssential",
+		"Avoid non-essential travel (with regional advisories)":           "AvoidNonEssentialReg",
+		"Avoid all travel (with regional advisories)":                     "AvoidAllReg",
+		"Avoid all travel":                                                "AvoidAll",
 	}
 )
 
+type OutputCountry struct {
+	FillKey string `json:"fillKey"`
+	Risk    string `json:"risk"`
+}
+
+type ISO struct {
+	Name        string `json:"name"`
+	Alpha3      string `json:"alpha-3"`
+	CountryCode string `json:"country-code"`
+}
+
 // Security shows the Security template
 func (c *Controller) Security(w http.ResponseWriter, r *http.Request) {
-	ctx := context.New(r)
-
-	sess := session.New(c.store, ctx)
-	v := view.New(c.tpl, ctx, sess)
-	country := request.QueryParam(r, "country", DefaultCountry)
-	country = "afghanistan"
-
-	doc, err := scraper.Fetch("https://travel.gc.ca/destinations/"+country, ".tabpanels")
+	doc, err := goquery.NewDocument("https://travel.gc.ca/travelling/advisories")
 	if err != nil {
 		logger.Debug("error: %s", err)
 		html.ServerError(w, err)
 		return
 	}
-	cards, err := proceedDoc(doc)
-	if err != nil {
-		logger.Debug("error: %s", err)
-		html.ServerError(w, err)
-		return
+	var data = make(map[string]OutputCountry)
+
+	var isos []ISO
+	file, err := ioutil.ReadFile("./news/3-codes-news.json")
+	err = json.Unmarshal(file, &isos)
+	isomap := make(map[string]string)
+	for _, el := range isos {
+		isomap[el.Name] = el.Alpha3
 	}
 
-	//security tab
-	for _, tab := range tabs {
-		v.Set(tab, cards[tab])
-	}
+	trs := doc.Find("tr.gradeX")
+	trs.Each(func(i int, tr *goquery.Selection) {
+		tds := tr.Find("td")
+		var countryName string
+		var countryCode string
+		tds.Each(func(j int, td *goquery.Selection) {
+			if j == 1 {
+				countryName = td.Text()
+				_, ok := isomap[countryName]
+				if !ok {
+					fmt.Println("ERROR", countryName)
+				} else {
+					countryCode, _ = isomap[countryName]
+				}
+			}
+			if j == 2 {
+				riskLevel, _ := levels[td.Text()]
+				data[countryCode] = OutputCountry{riskLevel, td.Text()}
+			}
+		})
 
-	html.OK(w, v.NewsAjaxRender("news_security"))
-}
-
-func proceedDoc(doc string) (map[string]string, error) {
-	var err error
-	proceeded := make(map[string]string)
-	reader := strings.NewReader(doc)
-
-	document, err := goquery.NewDocumentFromReader(reader)
-	if err != nil {
-		return proceeded, err
-	}
-	for _, tab := range tabs {
-		proceeded[tab], err = getDetail(document, tab)
-		if err != nil {
-			return proceeded, err
-		}
-	}
-
-	return proceeded, nil
-}
-
-func removeNodes(s *goquery.Selection) {
-	s.Each(func(i int, s *goquery.Selection) {
-		parent := s.Parent()
-		if parent.Length() > 0 {
-			parent.Get(0).RemoveChild(s.Get(0))
-		}
 	})
-}
+	js, _ := json.Marshal(data)
 
-func getDetail(doc *goquery.Document, name string) (string, error) {
-	selection := doc.Find("details[id=" + name + "]")
-	selection.Each(func(i int, s *goquery.Selection) {
-		removeNodes(s)
-	})
-	stringified, err := selection.Html()
-	if err != nil {
-		return "", err
-	}
-	return stringified, nil
+	//dataStr := `{
+	//"USA": { "fillKey": "AvoidAll" },
+	//"JPN": { "fillKey": "NormalPrecautionsReg" },
+	//"CAN": { "fillKey": "NormalPrecautions" },
+	//"RUS": { "fillKey": "HighCaution" },
+	//"IND": { "fillKey": "HighCautionReg" }
+	//}`
+
+	w.Write(js)
+	//w.Write([]byte(js))
+	return
 }
