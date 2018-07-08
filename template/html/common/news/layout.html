@@ -241,6 +241,7 @@
         <script defer>
             var map = new Datamap({
                 element: document.getElementById('map'),
+                responsive: true,
                 geographyConfig: {
                     highlightOnHover: true,
                     popupOnHover: true,
@@ -275,13 +276,15 @@
                     } catch (err) {
                         console.log(err);
                     }
-                    console.log(mapdata.ZWE);
+
                     return mapdata;
                 })()
             });
 
             var colors = d3.scale.category10();
-
+            window.addEventListener('resize', function() {
+                map.resize();
+            });
         </script>
 </body>
 </html>

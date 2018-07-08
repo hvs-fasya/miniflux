@@ -1,14 +1,14 @@
 package news
 
 import (
-	"github.com/PuerkitoBio/goquery"
-	"net/http"
-
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"net/http"
+
+	"github.com/PuerkitoBio/goquery"
 	"github.com/miniflux/miniflux/http/response/html"
 	"github.com/miniflux/miniflux/logger"
-	"io/ioutil"
 )
 
 var (
@@ -35,7 +35,7 @@ type ISO struct {
 	CountryCode string `json:"country-code"`
 }
 
-// Security shows the Security template
+// Security scraps and  sends security data
 func (c *Controller) Security(w http.ResponseWriter, r *http.Request) {
 	doc, err := goquery.NewDocument("https://travel.gc.ca/travelling/advisories")
 	if err != nil {
@@ -86,6 +86,5 @@ func (c *Controller) Security(w http.ResponseWriter, r *http.Request) {
 	//}`
 
 	w.Write(js)
-	//w.Write([]byte(js))
 	return
 }
