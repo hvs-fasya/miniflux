@@ -219,13 +219,9 @@
             });
 
             var entryDialog = document.querySelector("#entryContent");
-            // var showEntryButton = document.querySelector('a[]');
             if (! entryDialog.showModal) {
                 dialogPolyfill.registerDialog(entryDialog);
             }
-            // showEntryButton.addEventListener('click', function() {
-            //     entryDialog.showModal();
-            // });
             entryDialog.querySelector('.close').addEventListener('click', function() {
                 let body = entryDialog.querySelector('#entryContentBody');
                 body.innerHTML = "";
@@ -248,19 +244,25 @@
                     popupTemplate: function(geography, data) {
                         return '<div class="hoverinfo" style="white-space: pre-wrap;">' + geography.properties.name + ':\n' +  data.risk + ' '
                     },
+                    fillOpacity: 0.75,
+                    animate: true,
+                    highlightFillColor: '#FA0FA0',
+                    highlightBorderColor: 'rgba(250, 15, 160, 0.2)',
+                    highlightBorderWidth: 2,
+                    highlightFillOpacity: 0.85,
                     responsive: true
                 },
                 projection: 'mercator',
                 fills: {
-                    defaultFill: "#ABDDA4",
+                    defaultFill: "#f7f6f5",
                     NormalPrecautions: "#38b801",
-                    NormalPrecautionsReg: "#cadb01",
-                    HighCaution: "#fbc60e",
-                    HighCautionReg: "#f94c0a",
-                    AvoidNonEssential: "#e41f28",
-                    AvoidNonEssentialReg: "#e41f28",
-                    AvoidAllReg: "#5B0C10",
-                    AvoidAll: "#5B0C10",
+                    NormalPrecautionsReg: "#38b801",
+                    HighCaution: "#f3f30e",
+                    HighCautionReg: "#f3f30e",
+                    AvoidNonEssential: "#ff8b00",
+                    AvoidNonEssentialReg: "#ff8b00 ",
+                    AvoidAllReg: "#ff0000",
+                    AvoidAll: "#ff0000"
                 },
                 data:  (function(){
                     let xhr = new XMLHttpRequest();
@@ -281,6 +283,7 @@
                 })()
             });
 
+            map.legend();
             var colors = d3.scale.category10();
             window.addEventListener('resize', function() {
                 map.resize();
