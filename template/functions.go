@@ -5,16 +5,15 @@
 package template
 
 import (
-	"html/template"
-	"net/mail"
-	"strings"
-	"time"
-
 	"github.com/gorilla/mux"
 	"github.com/miniflux/miniflux/config"
 	"github.com/miniflux/miniflux/filter"
 	"github.com/miniflux/miniflux/http/route"
 	"github.com/miniflux/miniflux/url"
+	"html/template"
+	"net/mail"
+	"strings"
+	"time"
 )
 
 type funcMap struct {

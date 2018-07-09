@@ -92,6 +92,9 @@ func generateFile(serializer, pkg, mapName, pattern, output string) {
 		case "base64":
 			encodedContent := base64.StdEncoding.EncodeToString(content)
 			generatedFile.Files[basename] = encodedContent
+		case "news":
+			basename = normalizeBasename(basename)
+			generatedFile.Files["news_"+basename] = string(content)
 		default:
 			basename = normalizeBasename(basename)
 			generatedFile.Files[basename] = string(content)
@@ -117,4 +120,10 @@ func main() {
 	generateFile("none", "template", "templateViewsMap", "template/html/*.html", "template/views.go")
 	generateFile("none", "template", "templateCommonMap", "template/html/common/*.html", "template/common.go")
 	generateFile("none", "locale", "translations", "locale/translations/*.json", "locale/translations.go")
+
+	generateFile("base64", "static", "NewsBinaries", "news/static/bin/*", "news/static/bin.go")
+	generateFile("css", "static", "NewsStylesheets", "news/static/css/*.css", "news/static/css.go")
+	generateFile("js", "static", "NewsJavascript", "news/static/js/*.js", "news/static/js.go")
+	generateFile("news", "template", "templateNewsCommonMap", "template/html/common/news/*.html", "template/news_common.go")
+	generateFile("news", "template", "templateNewsViewsMap", "template/html/news/*.html", "template/news_views.go")
 }

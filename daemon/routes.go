@@ -12,6 +12,7 @@ import (
 	"github.com/miniflux/miniflux/fever"
 	"github.com/miniflux/miniflux/locale"
 	"github.com/miniflux/miniflux/middleware"
+	"github.com/miniflux/miniflux/news"
 	"github.com/miniflux/miniflux/reader/feed"
 	"github.com/miniflux/miniflux/scheduler"
 	"github.com/miniflux/miniflux/storage"
@@ -24,9 +25,11 @@ import (
 func routes(cfg *config.Config, store *storage.Storage, feedHandler *feed.Handler, pool *scheduler.WorkerPool, translator *locale.Translator) *mux.Router {
 	router := mux.NewRouter()
 	templateEngine := template.NewEngine(cfg, router, translator)
+	templateNewsEngine := template.NewNewsEngine(cfg, router, translator)
 	apiController := api.NewController(store, feedHandler)
 	feverController := fever.NewController(store)
 	uiController := ui.NewController(cfg, store, pool, feedHandler, templateEngine, translator, router)
+	newsController := news.NewController(cfg, store, pool, feedHandler, templateNewsEngine, translator, router)
 	middleware := middleware.New(cfg, store, router)
 
 	if cfg.BasePath() != "" {
@@ -45,6 +48,25 @@ func routes(cfg *config.Config, store *storage.Storage, feedHandler *feed.Handle
 		w.Header().Set("Content-Type", "text/plain")
 		w.Write([]byte("User-agent: *\nDisallow: /"))
 	})
+
+	newsRouter := router.PathPrefix(("/news")).Subrouter()
+	newsRouter.HandleFunc("/{name}.css", newsController.Stylesheet).Name("news_stylesheet").Methods("GET")
+	newsRouter.HandleFunc("/js", newsController.Javascript).Name("news_javascript").Methods("GET")
+	newsRouter.HandleFunc("/mdlselect", newsController.MdlSelect).Name("news_mdlselect").Methods("GET")
+	newsRouter.HandleFunc("/dialog-polyfill", newsController.DialogPolyfill).Name("news_dialog-polyfill").Methods("GET")
+	newsRouter.HandleFunc("/news", newsController.News).Name("news_news").Methods("GET")
+	newsRouter.HandleFunc("/favicon.ico", newsController.Favicon).Name("favicon").Methods("GET")
+	//newsRouter.HandleFunc("/icon/{filename}", newsController.AppIcon).Name("appIcon").Methods("GET")
+	newsRouter.HandleFunc("/manifest.json", newsController.WebManifest).Name("webManifest").Methods("GET")
+	newsRouter.HandleFunc("/", newsController.Home).Name("home").Methods("GET")
+	newsRouter.HandleFunc("/media", newsController.Media).Name("news_media").Methods("GET")
+	newsRouter.HandleFunc("/travel", newsController.Travel).Name("news_travel").Methods("GET")
+	newsRouter.HandleFunc("/official", newsController.Official).Name("news_official").Methods("GET")
+	newsRouter.HandleFunc("/security", newsController.Security).Name("news_security").Methods("GET")
+	newsRouter.HandleFunc("/visa", newsController.Visa).Name("news_visa").Methods("GET")
+	newsRouter.HandleFunc("/sources", newsController.Sources).Name("sources").Methods("GET")
+	newsRouter.HandleFunc("/icon/{iconID}", newsController.ShowIcon).Name("feedicon").Methods("GET")
+	newsRouter.HandleFunc("/entry/download/{entryID}", newsController.FetchContent).Name("newsFetchContent").Methods("POST")
 
 	feverRouter := router.PathPrefix("/fever").Subrouter()
 	feverRouter.Use(middleware.FeverAuth)

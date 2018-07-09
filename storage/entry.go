@@ -35,6 +35,11 @@ func (s *Storage) NewEntryQueryBuilder(userID int64) *EntryQueryBuilder {
 	return NewEntryQueryBuilder(s, userID)
 }
 
+// NewNewsEntryQueryBuilder returns a new NewsEntryQueryBuilder
+func (s *Storage) NewNewsEntryQueryBuilder() *NewsEntryQueryBuilder {
+	return NewNewsEntryQueryBuilder(s)
+}
+
 // createEntry add a new entry.
 func (s *Storage) createEntry(entry *model.Entry) error {
 	query := `
