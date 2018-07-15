@@ -79,7 +79,7 @@ var templateNewsViewsMap = map[string]string{
                         {{ elapsed "UTC" $e.Date }}
                             <span class="mdl-layout-spacer"></span>
                         {{ if gt $e.Feed.Icon.IconID 0 }}
-                            <i class="mdl-list__item-icon"><img src="{{ route "feedicon" "iconID" $e.Feed.Icon.IconID }}" width="26" height="26"></i>
+                            <i class="mdl-cell--hide-phone mdl-list__item-icon"><img src="{{ route "feedicon" "iconID" $e.Feed.Icon.IconID }}" width="26" height="26"></i>
                         {{ end }}
                         {{ $e.Feed.Title }}
                         </span>
@@ -154,7 +154,7 @@ var templateNewsViewsMap = map[string]string{
                         {{ elapsed "UTC" $e.Date }}
                             <span class="mdl-layout-spacer"></span>
                         {{ if gt $e.Feed.Icon.IconID 0 }}
-                            <i class="mdl-list__item-icon"><img src="{{ route "feedicon" "iconID" $e.Feed.Icon.IconID }}" width="26" height="26"></i>
+                            <i class="mdl-cell--hide-phone mdl-list__item-icon"><img src="{{ route "feedicon" "iconID" $e.Feed.Icon.IconID }}" width="26" height="26"></i>
                         {{ end }}
                         {{ $e.Feed.Title }}
                         </span>
@@ -325,7 +325,7 @@ var templateNewsViewsMap = map[string]string{
                         {{ elapsed "UTC" $e.Date }}
                             <span class="mdl-layout-spacer"></span>
                         {{ if gt $e.Feed.Icon.IconID 0 }}
-                            <i class="mdl-list__item-icon"><img src="{{ route "feedicon" "iconID" $e.Feed.Icon.IconID }}" width="26" height="26"></i>
+                            <i class="mdl-cell--hide-phon mdl-list__item-icon"><img src="{{ route "feedicon" "iconID" $e.Feed.Icon.IconID }}" width="26" height="26"></i>
                         {{ end }}
                         {{ $e.Feed.Title }}
                         </span>
@@ -406,7 +406,7 @@ var templateNewsViewsMap = map[string]string{
                         {{ elapsed "UTC" $e.Date }}
                             <span class="mdl-layout-spacer"></span>
                         {{ if gt $e.Feed.Icon.IconID 0 }}
-                            <i class="mdl-list__item-icon"><img src="{{ route "feedicon" "iconID" $e.Feed.Icon.IconID }}" width="26" height="26"></i>
+                            <i class="mdl-cell--hide-phon mdl-list__item-icon"><img src="{{ route "feedicon" "iconID" $e.Feed.Icon.IconID }}" width="26" height="26"></i>
                         {{ end }}
                         {{ $e.Feed.Title }}
                         </span>
@@ -440,9 +440,9 @@ var templateNewsViewsMap = map[string]string{
 
 var templateNewsViewsMapChecksums = map[string]string{
 	"home":     "1d6af89dabab628b0e32ba7a4d2cabf6e4de3f562d7913bd736adf96b24c5e1b",
-	"media":    "3ade9e3ac069404656e1c8805fbc8dfb437cd32079f0b59bc9aed6cb29f3799e",
-	"official": "bb42be6ef1e05030745feb46bc34235ed59bec785eb1b607802b74b2af479a14",
+	"media":    "751b97c448d0a5b31809b7f0c22273627fca8f930d728dfb460e92f1125e3cbd",
+	"official": "15a39e744c5d1d54eb4c68fcbb5e1969ea2e5dddd8cecc5074601480f1d0f137",
 	"sources":  "37878c8c51f13928e468057b7c88e8a0183a3c69094c8e702ac583d7edabd31d",
-	"travel":   "e292133fa926a1dd87c6f77922def87f3867e9e6bc182dbca2bbcba19a984f06",
-	"visa":     "43ef5b25e68074fb88516126610fc4a7ea51ecfaa55e01b78fa5435cdb942214",
+	"travel":   "569a509fce0a8c340e9f75c731299fb766b40b6ef6dd31c6bdcfc6ef2ca9d5f9",
+	"visa":     "ef3698199fe97a85fd54059bdf95eb40676fe923042ded3b21ae341d17a51df9",
 }

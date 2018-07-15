@@ -134,13 +134,13 @@ var templateNewsCommonMap = map[string]string{
 
     <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
         <header class="mdl-layout__header mdl-layout__header--scroll mdl-color--primary">
-            <div class="mdl-layout--large-screen-only mdl-layout__header-row demo-layout-transparent">
+            <div class="mdl-layout__header-row demo-layout-transparent">
                 <div class="mdl-layout__header-row">
                     <!-- Title -->
                     <span class="mdl-layout-title">VISADB.IO | NEWS <span class="red-span">LIVE</span></span>
                     <div class="mdl-layout-spacer"></div>
                     <!-- Navigation -->
-                    <nav class="mdl-navigation">
+                    <nav class="mdl-navigation mdl-layout--large-screen-only">
                         <a role="button" class="mdl-navigation__link--transparent" href="http://visadb.io" target="_blank">SEARCH VISA</a>
                         <a role="button" class="mdl-navigation__link--transparent" href="#" id="show-sources">DATA SOURCES</a>
                         <a role="button" id="show-subscribe" class="mdl-navigation__link--transparent" href="#">SUBSCRIBE</a>
@@ -159,9 +159,9 @@ var templateNewsCommonMap = map[string]string{
 
             </div>
 
-            <div class="mdl-layout--large-screen-only mdl-layout__header-row">
+            <div class="mdl-layout__header-row">
             </div>
-            <div class="mdl-layout--large-screen-only mdl-layout__header-row">
+            <div class="mdl-layout__header-row">
             {{/*<h3>VISADB - News</h3>*/}}
                 <div class="mdl-layout-spacer"></div>
                 <div class="mdl-textfield mdl-js-textfield getmdl-select getmdl-select__fix-height worldwide">
@@ -184,18 +184,41 @@ var templateNewsCommonMap = map[string]string{
                 <div class="mdl-layout-spacer"></div>
             </div>
 
-            <div class="mdl-layout--large-screen-only mdl-layout__header-row">
+            <div class="mdl-layout__header-row">
             </div>
             <div class="mdl-layout__tab-bar mdl-js-ripple-effect mdl-color--primary-dark">
                 <div class="mdl-layout-spacer"></div>
-                <a href="#official" class="mdl-layout__tab is-active">Official News</a>
-                <a href="#media" class="mdl-layout__tab">Media News</a>
-                <a href="#travel" class="mdl-layout__tab">Travel Alerts</a>
-                <a href="#security" class="mdl-layout__tab">Security Alerts</a>
-                <a href="#visa" class="mdl-layout__tab">Visa Changes</a>
+                <a href="#official" class="mdl-layout__tab is-active">
+                    <span class="mdl-layout--large-screen-only">Official News</span>
+                    <span class="mdl-layout--small-screen-only">Official</span>
+                </a>
+                <a href="#media" class="mdl-layout__tab">
+                    <span class="mdl-layout--large-screen-only">Media News</span>
+                    <span class="mdl-layout--small-screen-only">Media</span>
+                </a>
+                <a href="#travel" class="mdl-layout__tab">
+                    <span class="mdl-layout--large-screen-only">Travel Alerts</span>
+                    <span class="mdl-layout--small-screen-only">Travel</span>
+                </a>
+                <a href="#security" class="mdl-layout__tab">
+                    <span class="mdl-layout--large-screen-only">Security Alerts</span>
+                    <span class="mdl-layout--small-screen-only">Security</span>
+                </a>
+                <a href="#visa" class="mdl-layout__tab">
+                    <span class="mdl-layout--large-screen-only">Visa Changes</span>
+                    <span class="mdl-layout--small-screen-only">Visa</span>
+                </a>
                 <div class="mdl-layout-spacer"></div>
             </div>
         </header>
+        <div class="mdl-layout__drawer">
+            <nav class="mdl-navigation">
+                <a role="button" class="mdl-navigation__link--transparent" href="http://visadb.io" target="_blank">SEARCH VISA</a>
+                <a role="button" class="mdl-navigation__link--transparent" href="#" id="show-sources-1">DATA SOURCES</a>
+                <a role="button" id="show-subscribe-1" class="mdl-navigation__link--transparent" href="#">SUBSCRIBE</a>
+                <a role="button" id="show-contacts-1" class="mdl-navigation__link--transparent" href="#">CONTACTS</a>
+            </nav>
+        </div>
         <main class="mdl-layout__content">
         {{template "content" . }}
         {{ template "ticker" .ticker }}
@@ -209,10 +232,14 @@ var templateNewsCommonMap = map[string]string{
         <script>
             var dialog = document.querySelector('#contactsContent');
             var showDialogButton = document.querySelector('#show-contacts');
+            var showDialogButton1 = document.querySelector('#show-contacts-1');
             if (! dialog.showModal) {
                 dialogPolyfill.registerDialog(dialog);
             }
             showDialogButton.addEventListener('click', function() {
+                dialog.showModal();
+            });
+            showDialogButton1.addEventListener('click', function() {
                 dialog.showModal();
             });
             dialog.querySelector('.close').addEventListener('click', function() {
@@ -221,10 +248,14 @@ var templateNewsCommonMap = map[string]string{
 
             var subscribe = document.querySelector('#subscribeContent');
             var showSubscribeButton = document.querySelector('#show-subscribe');
+            var showSubscribeButton1 = document.querySelector('#show-subscribe-1');
             if (! subscribe.showModal) {
                 dialogPolyfill.registerDialog(subscribe);
             }
             showSubscribeButton.addEventListener('click', function() {
+                subscribe.showModal();
+            });
+            showSubscribeButton1.addEventListener('click', function() {
                 subscribe.showModal();
             });
             subscribe.querySelector('.close').addEventListener('click', function() {
@@ -233,10 +264,14 @@ var templateNewsCommonMap = map[string]string{
 
             var sources = document.querySelector('#sourcesContent');
             var showSourcesButton = document.querySelector('#show-sources');
+            var showSourcesButton1 = document.querySelector('#show-sources-1');
             if (! sources.showModal) {
                 dialogPolyfill.registerDialog(sources);
             }
             showSourcesButton.addEventListener('click', function() {
+                sources.showModal();
+            });
+            showSourcesButton1.addEventListener('click', function() {
                 sources.showModal();
             });
             sources.querySelector('.close').addEventListener('click', function() {
@@ -390,7 +425,7 @@ var templateNewsCommonMap = map[string]string{
 
 var templateNewsCommonMapChecksums = map[string]string{
 	"disclaimer": "fce75c71a10a694a25c54d952094b10870353309329e1e4e8bf9370ac9caf712",
-	"layout":     "b0432d934b5b11064ff3027f055a10014e5da9ffb4559ec15e5c6145f1de8219",
+	"layout":     "77e1ee6b083497fa017f6c98f3a3e4dcb3352a1199ce3eca40510b142f9cca6b",
 	"sources":    "ed72d5167279a038b60d3d2cad8347b7404b354e85c753167a298acfb7d344e3",
 	"ticker":     "94cbf10646256355fa43d66badc31068199d2775f67266674ccb3ec55d75b307",
 	"travel":     "55313525e6c21868800810ade5a5cf82c98d5bdc6479624c71990eddbeb3aa97",
