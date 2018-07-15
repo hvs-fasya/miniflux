@@ -49,7 +49,7 @@
                         {{ elapsed "UTC" $e.Date }}
                             <span class="mdl-layout-spacer"></span>
                         {{ if gt $e.Feed.Icon.IconID 0 }}
-                            <i class="mdl-list__item-icon"><img src="{{ route "feedicon" "iconID" $e.Feed.Icon.IconID }}" width="26" height="26"></i>
+                            <i class="mdl-cell--hide-phon mdl-list__item-icon"><img src="{{ route "feedicon" "iconID" $e.Feed.Icon.IconID }}" width="26" height="26"></i>
                         {{ end }}
                         {{ $e.Feed.Title }}
                         </span>
