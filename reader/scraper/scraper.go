@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	neturl "net/url"
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
@@ -19,6 +20,7 @@ import (
 
 // Fetch downloads a web page a returns relevant contents.
 func Fetch(websiteURL, rules string) (string, error) {
+	websiteURL = overrideGoogleRedirect(websiteURL)
 	clt := client.New(websiteURL)
 	response, err := clt.Get()
 	if err != nil {
@@ -94,4 +96,16 @@ func getPredefinedScraperRules(websiteURL string) string {
 	}
 
 	return ""
+}
+
+func overrideGoogleRedirect(websiteURL string) string {
+	urlStruct, err := neturl.Parse(websiteURL)
+	if err != nil {
+		return websiteURL
+	}
+	if urlStruct.Host == "www.google.com" {
+		redirect := urlStruct.Query().Get("url")
+		return redirect
+	}
+	return websiteURL
 }
