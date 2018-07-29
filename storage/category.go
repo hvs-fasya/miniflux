@@ -34,6 +34,16 @@ func (s *Storage) CategoryExists(userID, categoryID int64) bool {
 	return result >= 1
 }
 
+// CategoryWOUserIDExists checks if the given category exists into the database.
+func (s *Storage) CategoryWOUserIDExists(categoryID int64) bool {
+	defer timer.ExecutionTime(time.Now(), fmt.Sprintf("[Storage:CategoryWOUserIDExists] categoryID=%d", categoryID))
+
+	var result int
+	query := `SELECT count(*) as c FROM categories WHERE id=$1`
+	s.db.QueryRow(query, categoryID).Scan(&result)
+	return result >= 1
+}
+
 // Category returns a category from the database.
 func (s *Storage) Category(userID, categoryID int64) (*model.Category, error) {
 	defer timer.ExecutionTime(time.Now(), fmt.Sprintf("[Storage:Category] userID=%d, getCategory=%d", userID, categoryID))

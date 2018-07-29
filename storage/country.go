@@ -75,31 +75,10 @@ func (s *Storage) CountryByName(name string) (*model.Country, error) {
 	query := `SELECT
 		id, name, alpha3
 		FROM countries
-		WHERE name=LOWER($1)`
+		WHERE name=$1`
 
 	return s.fetchCountry(query, name)
 }
-
-//// RemoveUser deletes a user.
-//func (s *Storage) RemoveUser(userID int64) error {
-//	defer timer.ExecutionTime(time.Now(), fmt.Sprintf("[Storage:RemoveUser] userID=%d", userID))
-//
-//	result, err := s.db.Exec("DELETE FROM users WHERE id = $1", userID)
-//	if err != nil {
-//		return fmt.Errorf("unable to remove this user: %v", err)
-//	}
-//
-//	count, err := result.RowsAffected()
-//	if err != nil {
-//		return fmt.Errorf("unable to remove this user: %v", err)
-//	}
-//
-//	if count == 0 {
-//		return errors.New("nothing has been removed")
-//	}
-//
-//	return nil
-//}
 
 func (s *Storage) fetchCountry(query string, args ...interface{}) (*model.Country, error) {
 	country := model.NewCountry()
@@ -150,4 +129,14 @@ func (s *Storage) Countries() (model.Countries, error) {
 	}
 
 	return countries, nil
+}
+
+// CountryExists checks if the given country exists in the database.
+func (s *Storage) CountryExists(countryID int64) bool {
+	defer timer.ExecutionTime(time.Now(), fmt.Sprintf("[Storage:CountryExists] countryID=%d", countryID))
+
+	var result int
+	query := `SELECT count(*) as c FROM countries WHERE id=$1`
+	s.db.QueryRow(query, countryID).Scan(&result)
+	return result >= 1
 }
