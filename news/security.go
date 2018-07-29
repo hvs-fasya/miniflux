@@ -47,6 +47,9 @@ func (c *Controller) Security(w http.ResponseWriter, r *http.Request) {
 
 	var isos []ISO
 	file, err := ioutil.ReadFile("./news/3-codes-news.json")
+	if err != nil {
+		fmt.Println("error: %s", err)
+	}
 	err = json.Unmarshal(file, &isos)
 	isomap := make(map[string]string)
 	for _, el := range isos {
