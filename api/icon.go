@@ -43,3 +43,29 @@ func (c *Controller) FeedIcon(w http.ResponseWriter, r *http.Request) {
 		Data:     icon.DataURL(),
 	})
 }
+
+// HeadlineIcon returns a headline icon.
+func (c *Controller) HeadlineIcon(w http.ResponseWriter, r *http.Request) {
+	headlineID, err := request.IntParam(r, "headlineID")
+	if err != nil {
+		json.BadRequest(w, err)
+		return
+	}
+
+	icon, err := c.store.IconByHeadlineID(headlineID)
+	if err != nil {
+		json.ServerError(w, errors.New("Unable to fetch headline icon"))
+		return
+	}
+
+	if icon == nil {
+		json.NotFound(w, errors.New("This headline doesn't have any icon"))
+		return
+	}
+
+	json.OK(w, &feedIcon{
+		ID:       icon.ID,
+		MimeType: icon.MimeType,
+		Data:     icon.DataURL(),
+	})
+}

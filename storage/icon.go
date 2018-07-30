@@ -60,6 +60,27 @@ func (s *Storage) IconByFeedID(userID, feedID int64) (*model.Icon, error) {
 	return &icon, nil
 }
 
+// IconByHeadlineID returns a headline icon.
+func (s *Storage) IconByHeadlineID(headlineID int64) (*model.Icon, error) {
+	defer timer.ExecutionTime(time.Now(), fmt.Sprintf("[Storage:IconByHeadlineID] headlineID=%d", headlineID))
+	query := `
+		SELECT
+		icons.id, icons.hash, icons.mime_type, icons.content
+		FROM icons
+		LEFT JOIN headlines ON headlines.icon_id=icons.id
+		WHERE headlines.id=$1
+		LIMIT 1
+	`
+
+	var icon model.Icon
+	err := s.db.QueryRow(query, headlineID).Scan(&icon.ID, &icon.Hash, &icon.MimeType, &icon.Content)
+	if err != nil {
+		return nil, fmt.Errorf("unable to fetch icon: %v", err)
+	}
+
+	return &icon, nil
+}
+
 // IconByHash returns an icon by the hash (checksum).
 func (s *Storage) IconByHash(icon *model.Icon) error {
 	defer timer.ExecutionTime(time.Now(), "[Storage:IconByHash]")
@@ -118,6 +139,30 @@ func (s *Storage) CreateFeedIcon(feed *model.Feed, icon *model.Icon) error {
 	_, err = s.db.Exec(`INSERT INTO feed_icons (feed_id, icon_id) VALUES ($1, $2)`, feed.ID, icon.ID)
 	if err != nil {
 		return fmt.Errorf("unable to create feed icon: %v", err)
+	}
+
+	return nil
+}
+
+// CreateHeadlineIcon creates an icon and associate the icon to the given headline.
+func (s *Storage) CreateHeadlineIcon(headline *model.Headline, icon *model.Icon) error {
+	defer timer.ExecutionTime(time.Now(), fmt.Sprintf("[Storage:CreateHeadlineIcon] feedID=%d", headline.ID))
+
+	err := s.IconByHash(icon)
+	if err != nil {
+		return err
+	}
+
+	if icon.ID == 0 {
+		err := s.CreateIcon(icon)
+		if err != nil {
+			return err
+		}
+	}
+
+	_, err = s.db.Exec(`UPDATE headlines SET icon_id = $1 WHERE id = $2`, icon.ID, headline.ID)
+	if err != nil {
+		return fmt.Errorf("unable to create headline icon: %v", err)
 	}
 
 	return nil

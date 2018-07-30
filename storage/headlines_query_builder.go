@@ -123,7 +123,7 @@ func (e *HeadlinesQueryBuilder) GetHeadlines() (model.Headlines, error) {
 		SELECT
 		e.id, e.hash, e.published_at, e.title,
 		e.url, e.content,
-		e.category_id, e.country_id, e.visatype
+		e.category_id, e.country_id, e.visatype, e.icon_id
 		FROM headlines e
 		WHERE %s %s
 	`
@@ -152,9 +152,11 @@ func (e *HeadlinesQueryBuilder) GetHeadlines() (model.Headlines, error) {
 			&headline.CategoryID,
 			&headline.CountryID,
 			&headline.VisaType,
+			&headline.IconID,
 		)
 
 		if err != nil {
+			fmt.Println(err)
 			return nil, fmt.Errorf("unable to fetch headline row: %v", err)
 		}
 

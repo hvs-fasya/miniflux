@@ -9,13 +9,13 @@ import (
 	"net/http"
 	"time"
 
-	"fmt"
 	"github.com/miniflux/miniflux/http/context"
 	"github.com/miniflux/miniflux/http/request"
 	"github.com/miniflux/miniflux/http/response/json"
 	"github.com/miniflux/miniflux/logger"
 	"github.com/miniflux/miniflux/model"
 	"github.com/miniflux/miniflux/news"
+	"github.com/miniflux/miniflux/reader/icon"
 )
 
 var (
@@ -38,6 +38,18 @@ type EntryOutput struct {
 	Url         string    `json:"url"`
 	PublishedAt time.Time `json:"published_at"`
 	CategoryID  int64     `json:"category_id"`
+	Icon        *feedIcon `json:"icon"`
+}
+
+type HeadlineOutput struct {
+	ID          int64     `json:"id"`
+	PublishedAt time.Time `json:"published_at"`
+	Title       string    `json:"title"`
+	Content     string    `json:"content"`
+	Url         string    `json:"url"`
+	CountryID   int64     `json:"country_id"`
+	VisaType    string    `json:"visatype"`
+	Icon        *feedIcon `json:"icon"`
 }
 
 // CreateHeadline is the API handler to create a new headline.
@@ -80,6 +92,15 @@ func (c *Controller) CreateHeadline(w http.ResponseWriter, r *http.Request) {
 		logger.Debug("create headline error: %s", err)
 		json.ServerError(w, errors.New("Unable to create this headline"))
 		return
+	}
+
+	hicon, err := icon.FindIcon(headline.Url)
+	if err != nil {
+		logger.Error("[Handler:CreateFeed] %v", err)
+	} else if hicon == nil {
+		logger.Info("No icon found for headlineID=%d", headline.ID)
+	} else {
+		c.store.CreateHeadlineIcon(headline, hicon)
 	}
 
 	json.Created(w, headline)
@@ -189,12 +210,24 @@ func (c *Controller) HeadlinesFull(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for _, e := range officialEntries {
+		var fIcon *model.Icon
+		if c.store.HasIcon(e.Feed.ID) {
+			fIcon, _ = c.store.IconByID(e.Feed.Icon.IconID)
+		}
+
 		of := EntryOutput{
 			Title:       e.Title,
 			Content:     e.Content,
 			Url:         e.URL,
 			PublishedAt: e.Date,
 			CategoryID:  e.Feed.Category.ID,
+		}
+		if fIcon != nil {
+			of.Icon = &feedIcon{
+				ID:       fIcon.ID,
+				MimeType: fIcon.MimeType,
+				Data:     fIcon.DataURL(),
+			}
 		}
 		officials = append(officials, of)
 	}
@@ -222,12 +255,23 @@ func (c *Controller) HeadlinesFull(w http.ResponseWriter, r *http.Request) {
 	}
 	var medias = []EntryOutput{}
 	for _, e := range mediaEntries {
+		var fIcon *model.Icon
+		if c.store.HasIcon(e.Feed.ID) {
+			fIcon, _ = c.store.IconByID(e.Feed.Icon.IconID)
+		}
 		of := EntryOutput{
 			Title:       e.Title,
 			Content:     e.Content,
 			Url:         e.URL,
 			PublishedAt: e.Date,
 			CategoryID:  e.Feed.Category.ID,
+		}
+		if fIcon != nil {
+			of.Icon = &feedIcon{
+				ID:       fIcon.ID,
+				MimeType: fIcon.MimeType,
+				Data:     fIcon.DataURL(),
+			}
 		}
 		medias = append(medias, of)
 	}
@@ -247,25 +291,48 @@ func (c *Controller) HeadlinesFull(w http.ResponseWriter, r *http.Request) {
 
 	headlines, err := headlinesBuilder.GetHeadlines()
 	if err != nil {
-		fmt.Println(err)
 		json.ServerError(w, errors.New("Unable to fetch headlines"))
 		return
 	}
 
+	var hlines = []HeadlineOutput{}
+	for _, e := range headlines {
+		h := HeadlineOutput{
+			PublishedAt: e.PublishedAt,
+			Title:       e.Title,
+			Content:     e.Content,
+			Url:         e.Url,
+			CountryID:   e.CountryID,
+			VisaType:    e.VisaType,
+		}
+		var fIcon *model.Icon
+		if e.IconID.Valid {
+			fIcon, _ = c.store.IconByID(e.IconID.Int64)
+		}
+		if fIcon != nil {
+			h.Icon = &feedIcon{
+				ID:       fIcon.ID,
+				MimeType: fIcon.MimeType,
+				Data:     fIcon.DataURL(),
+			}
+		}
+		hlines = append(hlines, h)
+	}
+
 	publishObj := struct {
-		Officials      []EntryOutput   `json:"officials"`
-		Headlines      model.Headlines `json:"headlines"`
-		Media          []EntryOutput   `json:"media"`
-		OfficialCount  int             `json:"official_count"`
-		MediaCount     int             `json:"media_count"`
-		HeadlinesCount int             `json:"headlines_count"`
+		Officials      []EntryOutput    `json:"officials"`
+		Headlines      []HeadlineOutput `json:"headlines"`
+		Media          []EntryOutput    `json:"media"`
+		OfficialCount  int              `json:"official_count"`
+		MediaCount     int              `json:"media_count"`
+		HeadlinesCount int              `json:"headlines_count"`
 	}{
 		officials,
-		headlines,
+		hlines,
 		medias,
 		len(officialEntries),
 		len(mediaEntries),
-		len(headlines),
+		len(hlines),
 	}
 
 	json.OK(w, publishObj)

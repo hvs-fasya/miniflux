@@ -16,10 +16,12 @@ create table headlines (
      country_id bigint not null,
      visatype text,
      category_id bigint not null,
+     icon_id bigint,
      primary key (id),
      unique (hash),
      foreign key (country_id) references countries(id) on delete cascade,
-     foreign key (category_id) references categories(id) on delete cascade
+     foreign key (category_id) references categories(id) on delete cascade,
+     foreign key (icon_id) references icons(id) on delete cascade
  );
 
 create index headlines_content_idx on headlines using btree(content);

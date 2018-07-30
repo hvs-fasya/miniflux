@@ -5,21 +5,23 @@
 package model
 
 import (
+	"database/sql"
 	"errors"
 	"time"
 )
 
 // User represents a user in the system.
 type Headline struct {
-	ID          int64     `json:"id"`
-	Hash        string    `json:"-"`
-	PublishedAt time.Time `json:"published_at"`
-	Title       string    `json:"title"`
-	Content     string    `json:"content"`
-	Url         string    `json:"url"`
-	CountryID   int64     `json:"country_id"`
-	VisaType    string    `json:"visatype"`
-	CategoryID  int64     `json:"category_id"`
+	ID          int64         `json:"id"`
+	Hash        string        `json:"-"`
+	PublishedAt time.Time     `json:"published_at"`
+	Title       string        `json:"title"`
+	Content     string        `json:"content"`
+	Url         string        `json:"url"`
+	CountryID   int64         `json:"country_id"`
+	VisaType    string        `json:"visatype"`
+	CategoryID  int64         `json:"category_id"`
+	IconID      sql.NullInt64 `json:"icon_id"`
 }
 
 // NewHeadline returns a new Headline.
