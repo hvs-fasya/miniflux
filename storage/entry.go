@@ -40,6 +40,11 @@ func (s *Storage) NewNewsEntryQueryBuilder() *NewsEntryQueryBuilder {
 	return NewNewsEntryQueryBuilder(s)
 }
 
+// NewHeadlinesOfficialEntryQueryBuilder returns a new NewsEntryQueryBuilder
+func (s *Storage) NewHeadlinesOfficialEntryQueryBuilder() *HeadlinesOfficialEntryQueryBuilder {
+	return NewHeadlinesOfficialEntryQueryBuilder(s)
+}
+
 // createEntry add a new entry.
 func (s *Storage) createEntry(entry *model.Entry) error {
 	query := `

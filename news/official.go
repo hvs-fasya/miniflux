@@ -1,6 +1,9 @@
 package news
 
 import (
+	"net/http"
+	"time"
+
 	"github.com/miniflux/miniflux/http/context"
 	"github.com/miniflux/miniflux/http/request"
 	"github.com/miniflux/miniflux/http/response/html"
@@ -8,8 +11,6 @@ import (
 	"github.com/miniflux/miniflux/model"
 	"github.com/miniflux/miniflux/ui/session"
 	"github.com/miniflux/miniflux/ui/view"
-	"net/http"
-	"time"
 )
 
 const DefaultCountry = "WORLDWIDE"

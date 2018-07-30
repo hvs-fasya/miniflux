@@ -22,6 +22,7 @@ func Parse() {
 	flagMigrate := flag.Bool("migrate", false, "Migrate database schema")
 	flagFlushSessions := flag.Bool("flush-sessions", false, "Flush all sessions (disconnect users)")
 	flagCreateAdmin := flag.Bool("create-admin", false, "Create admin user")
+	flagSeedCountries := flag.Bool("seed-countries", false, "Seed countries table")
 	flagResetPassword := flag.Bool("reset-password", false, "Reset user password")
 	flagDebugMode := flag.Bool("debug", false, "Enable debug mode (more verbose output)")
 	flag.Parse()
@@ -64,6 +65,11 @@ func Parse() {
 
 	if *flagResetPassword {
 		resetPassword(store)
+		return
+	}
+
+	if *flagSeedCountries {
+		seedCountries(store)
 		return
 	}
 

@@ -117,3 +117,15 @@ func decodeFilterPayload(r io.ReadCloser) (*model.Filter, error) {
 
 	return &filter, nil
 }
+
+func decodeHeadlinePayload(r io.ReadCloser) (*model.Headline, error) {
+	var headline model.Headline
+
+	decoder := json.NewDecoder(r)
+	defer r.Close()
+	if err := decoder.Decode(&headline); err != nil {
+		return nil, fmt.Errorf("Unable to decode headline JSON object: %v", err)
+	}
+
+	return &headline, nil
+}
