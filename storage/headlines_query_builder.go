@@ -123,8 +123,12 @@ func (e *HeadlinesQueryBuilder) GetHeadlines() (model.Headlines, error) {
 		SELECT
 		e.id, e.hash, e.published_at, e.title,
 		e.url, e.content,
-		e.category_id, e.country_id, e.visatype, e.icon_id
+		e.category_id, e.country_id, e.visatype, e.icon_id,
+		c.title as category_title,
+		co.name as country_title
 		FROM headlines e
+		LEFT JOIN categories c ON c.id=e.category_id
+		LEFT JOIN countries co ON co.id=e.country_id
 		WHERE %s %s
 	`
 
@@ -142,6 +146,9 @@ func (e *HeadlinesQueryBuilder) GetHeadlines() (model.Headlines, error) {
 	for rows.Next() {
 		var headline model.Headline
 
+		headline.Category = &model.Category{}
+		headline.Country = &model.Country{}
+
 		err := rows.Scan(
 			&headline.ID,
 			&headline.Hash,
@@ -153,6 +160,8 @@ func (e *HeadlinesQueryBuilder) GetHeadlines() (model.Headlines, error) {
 			&headline.CountryID,
 			&headline.VisaType,
 			&headline.IconID,
+			&headline.Category.Title,
+			&headline.Country.Name,
 		)
 
 		if err != nil {

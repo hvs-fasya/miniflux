@@ -22,6 +22,8 @@ type Headline struct {
 	VisaType    string        `json:"visatype"`
 	CategoryID  int64         `json:"category_id"`
 	IconID      sql.NullInt64 `json:"icon_id"`
+	Category    *Category     `json:"category,omitempty"`
+	Country     *Country      `json:"country,omitempty"`
 }
 
 // NewHeadline returns a new Headline.

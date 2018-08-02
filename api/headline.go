@@ -33,23 +33,24 @@ var (
 )
 
 type EntryOutput struct {
-	Title       string    `json:"title"`
-	Content     string    `json:"content"`
-	Url         string    `json:"url"`
-	PublishedAt time.Time `json:"published_at"`
-	CategoryID  int64     `json:"category_id"`
-	Icon        *feedIcon `json:"icon"`
+	Title        string    `json:"title"`
+	Content      string    `json:"content"`
+	Url          string    `json:"url"`
+	PublishedAt  time.Time `json:"published_at"`
+	CategoryName string    `json:"category_name"`
+	Icon         *feedIcon `json:"icon"`
 }
 
 type HeadlineOutput struct {
-	ID          int64     `json:"id"`
-	PublishedAt time.Time `json:"published_at"`
-	Title       string    `json:"title"`
-	Content     string    `json:"content"`
-	Url         string    `json:"url"`
-	CountryID   int64     `json:"country_id"`
-	VisaType    string    `json:"visatype"`
-	Icon        *feedIcon `json:"icon"`
+	ID           int64     `json:"id"`
+	PublishedAt  time.Time `json:"published_at"`
+	Title        string    `json:"title"`
+	Content      string    `json:"content"`
+	Url          string    `json:"url"`
+	CountryName  string    `json:"country_name"`
+	CategoryName string    `json:"category_name"`
+	VisaType     string    `json:"visatype"`
+	Icon         *feedIcon `json:"icon"`
 }
 
 // CreateHeadline is the API handler to create a new headline.
@@ -216,11 +217,11 @@ func (c *Controller) HeadlinesFull(w http.ResponseWriter, r *http.Request) {
 		}
 
 		of := EntryOutput{
-			Title:       e.Title,
-			Content:     e.Content,
-			Url:         e.URL,
-			PublishedAt: e.Date,
-			CategoryID:  e.Feed.Category.ID,
+			Title:        e.Title,
+			Content:      e.Content,
+			Url:          e.URL,
+			PublishedAt:  e.Date,
+			CategoryName: e.Feed.Category.Title,
 		}
 		if fIcon != nil {
 			of.Icon = &feedIcon{
@@ -260,11 +261,11 @@ func (c *Controller) HeadlinesFull(w http.ResponseWriter, r *http.Request) {
 			fIcon, _ = c.store.IconByID(e.Feed.Icon.IconID)
 		}
 		of := EntryOutput{
-			Title:       e.Title,
-			Content:     e.Content,
-			Url:         e.URL,
-			PublishedAt: e.Date,
-			CategoryID:  e.Feed.Category.ID,
+			Title:        e.Title,
+			Content:      e.Content,
+			Url:          e.URL,
+			PublishedAt:  e.Date,
+			CategoryName: e.Feed.Category.Title,
 		}
 		if fIcon != nil {
 			of.Icon = &feedIcon{
@@ -298,12 +299,13 @@ func (c *Controller) HeadlinesFull(w http.ResponseWriter, r *http.Request) {
 	var hlines = []HeadlineOutput{}
 	for _, e := range headlines {
 		h := HeadlineOutput{
-			PublishedAt: e.PublishedAt,
-			Title:       e.Title,
-			Content:     e.Content,
-			Url:         e.Url,
-			CountryID:   e.CountryID,
-			VisaType:    e.VisaType,
+			PublishedAt:  e.PublishedAt,
+			Title:        e.Title,
+			Content:      e.Content,
+			Url:          e.Url,
+			CountryName:  e.Country.Name,
+			CategoryName: e.Category.Title,
+			VisaType:     e.VisaType,
 		}
 		var fIcon *model.Icon
 		if e.IconID.Valid {
