@@ -12,7 +12,7 @@ import (
 	"github.com/miniflux/miniflux/sql"
 )
 
-const schemaVersion = 18
+const schemaVersion = 19
 
 //const schemaVersion = 16
 

@@ -129,3 +129,15 @@ func decodeHeadlinePayload(r io.ReadCloser) (*model.Headline, error) {
 
 	return &headline, nil
 }
+
+func decodeVisaupdatePayload(r io.ReadCloser) (*model.Visaupdate, error) {
+	var visaupdate model.Visaupdate
+
+	decoder := json.NewDecoder(r)
+	defer r.Close()
+	if err := decoder.Decode(&visaupdate); err != nil {
+		return nil, fmt.Errorf("Unable to decode visaupdate JSON object: %v", err)
+	}
+
+	return &visaupdate, nil
+}
