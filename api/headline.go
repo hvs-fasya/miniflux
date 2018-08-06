@@ -16,6 +16,8 @@ import (
 	"github.com/miniflux/miniflux/model"
 	"github.com/miniflux/miniflux/news"
 	"github.com/miniflux/miniflux/reader/icon"
+	"net/url"
+	"strings"
 )
 
 var (
@@ -216,10 +218,16 @@ func (c *Controller) HeadlinesFull(w http.ResponseWriter, r *http.Request) {
 			fIcon, _ = c.store.IconByID(e.Feed.Icon.IconID)
 		}
 
+		var entryUrl = e.URL
+		if strings.Contains(e.URL, `https://www.google.com/url?`) {
+			u, _ := url.Parse(e.URL)
+			entryUrl = u.Query().Get("url")
+		}
+
 		of := EntryOutput{
 			Title:        e.Title,
 			Content:      e.Content,
-			Url:          e.URL,
+			Url:          entryUrl,
 			PublishedAt:  e.Date,
 			CategoryName: e.Feed.Category.Title,
 		}
@@ -260,10 +268,17 @@ func (c *Controller) HeadlinesFull(w http.ResponseWriter, r *http.Request) {
 		if c.store.HasIcon(e.Feed.ID) {
 			fIcon, _ = c.store.IconByID(e.Feed.Icon.IconID)
 		}
+
+		var entryUrl = e.URL
+		if strings.Contains(e.URL, `https://www.google.com/url?`) {
+			u, _ := url.Parse(e.URL)
+			entryUrl = u.Query().Get("url")
+		}
+
 		of := EntryOutput{
 			Title:        e.Title,
 			Content:      e.Content,
-			Url:          e.URL,
+			Url:          entryUrl,
 			PublishedAt:  e.Date,
 			CategoryName: e.Feed.Category.Title,
 		}
