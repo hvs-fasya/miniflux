@@ -138,6 +138,7 @@ func (e *HeadlinesQueryBuilder) GetHeadlines() (model.Headlines, error) {
 
 	rows, err := e.store.db.Query(query, args...)
 	if err != nil {
+		fmt.Println(err)
 		return nil, fmt.Errorf("unable to get headlines: %v", err)
 	}
 	defer rows.Close()

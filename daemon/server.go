@@ -15,7 +15,6 @@ import (
 	"github.com/miniflux/miniflux/reader/feed"
 	"github.com/miniflux/miniflux/scheduler"
 	"github.com/miniflux/miniflux/storage"
-
 	"golang.org/x/crypto/acme/autocert"
 )
 

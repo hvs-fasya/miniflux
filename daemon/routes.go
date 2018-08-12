@@ -74,6 +74,12 @@ func routes(cfg *config.Config, store *storage.Storage, feedHandler *feed.Handle
 
 	apiRouter := router.PathPrefix("/v1").Subrouter()
 	apiRouter.Use(middleware.BasicAuth)
+	apiRouter.Methods("OPTIONS").HandlerFunc(
+		func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(""))
+			return
+		})
 	apiRouter.HandleFunc("/users", apiController.CreateUser).Methods("POST")
 	apiRouter.HandleFunc("/users", apiController.Users).Methods("GET")
 	apiRouter.HandleFunc("/users/{userID:[0-9]+}", apiController.UserByID).Methods("GET")
