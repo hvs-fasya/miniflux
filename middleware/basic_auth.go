@@ -8,6 +8,7 @@ import (
 	"context"
 	"net/http"
 
+	"fmt"
 	"github.com/miniflux/miniflux/http/response/json"
 	"github.com/miniflux/miniflux/logger"
 )
@@ -16,14 +17,16 @@ import (
 func (m *Middleware) BasicAuth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("WWW-Authenticate", `Basic realm="Restricted"`)
-
+		if r.Method == "OPTIONS" {
+			return
+		}
 		username, password, authOK := r.BasicAuth()
 		if !authOK {
 			logger.Debug("[Middleware:BasicAuth] No authentication headers sent")
 			json.Unauthorized(w)
 			return
 		}
-
+		fmt.Println(username, password)
 		if err := m.store.CheckPassword(username, password); err != nil {
 			logger.Info("[Middleware:BasicAuth] Invalid username or password: %s", username)
 			json.Unauthorized(w)
