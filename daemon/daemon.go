@@ -15,6 +15,7 @@ import (
 	"github.com/miniflux/miniflux/config"
 	"github.com/miniflux/miniflux/locale"
 	"github.com/miniflux/miniflux/logger"
+	"github.com/miniflux/miniflux/reader/alert"
 	"github.com/miniflux/miniflux/reader/feed"
 	"github.com/miniflux/miniflux/scheduler"
 	"github.com/miniflux/miniflux/storage"
@@ -26,7 +27,8 @@ func Run(cfg *config.Config, store *storage.Storage) {
 
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, os.Interrupt)
-	signal.Notify(stop, syscall.SIGTERM)
+	signal.Notify(stop,
+		syscall.SIGTERM)
 
 	go func() {
 		for {
@@ -51,6 +53,14 @@ func Run(cfg *config.Config, store *storage.Storage) {
 	)
 
 	scheduler.NewSessionScheduler(store, cfg.SessionCleanupFrequency())
+
+	go func() {
+		alert.Task(store)
+		c := time.Tick(24 * time.Hour)
+		for range c {
+			alert.Task(store)
+		}
+	}()
 
 	<-stop
 	logger.Info("Shutting down the server...")
