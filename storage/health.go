@@ -19,84 +19,84 @@ import (
 //	return NewHeadlinesQueryBuilder(s)
 //}
 
-// AlertExists checks if a alert exists by using the country_id.
-func (s *Storage) AlertExists(countryID int64) bool {
-	defer timer.ExecutionTime(time.Now(), fmt.Sprintf("[Storage:AlertExists] countryID=%d", countryID))
+// HealthExists checks if a health exists by using the health_title.
+func (s *Storage) HealthExists(healthTitle string) bool {
+	defer timer.ExecutionTime(time.Now(), fmt.Sprintf("[Storage:HealthExists] healthTitle=%s", healthTitle))
 
 	var result int
-	s.db.QueryRow(`SELECT count(*) as c FROM alerts WHERE country_id=$1`, countryID).Scan(&result)
+	s.db.QueryRow(`SELECT count(*) as c FROM healths WHERE health_title=$1`, healthTitle).Scan(&result)
 	return result >= 1
 }
 
-// CreateAlert creates a new alert.
-func (s *Storage) CreateAlert(alert *model.Alert) (err error) {
-	defer timer.ExecutionTime(time.Now(), fmt.Sprintf("[Storage:CreateAlert] country_id=%d", alert.CountryID))
+// CreateHealth creates a new Health.
+func (s *Storage) CreateHealth(health *model.Health) (err error) {
+	defer timer.ExecutionTime(time.Now(), fmt.Sprintf("[Storage:CreateHealth] health_title=%s", health.HealthTitle))
 
-	query := `INSERT INTO alerts
-		(last_updated, still_valid, latest_updates, risk_level, risk_details, country_id)
+	query := `INSERT INTO healths
+		(health_link, health_title, health_content, last_updated)
 		VALUES
-		($1, $2, $3, $4, $5, $6)`
+		($1, $2, $3, $4)`
 
-	_, err = s.db.Exec(query, alert.LastUpdated, alert.StillValid, alert.LatestUpdates, alert.RiskLevel, alert.RiskDetails, alert.CountryID)
+	_, err = s.db.Exec(query, health.HealthLink, health.HealthTitle, health.HealthContent, time.Now())
 	if err != nil {
-		return fmt.Errorf("unable to create alert: %v", err)
+		return fmt.Errorf("unable to create health: %v", err)
 	}
 
 	return nil
 }
 
-// UpdateAlert updates a Alert.
-func (s *Storage) UpdateAlert(alert *model.Alert) error {
-	defer timer.ExecutionTime(time.Now(), fmt.Sprintf("[Storage:UpdateAlert] alertID=%d", alert.ID))
+// UpdateHealth updates a Health.
+func (s *Storage) UpdateHealth(health *model.Health) error {
+	defer timer.ExecutionTime(time.Now(), fmt.Sprintf("[Storage:UpdateHealth] health_title=%s", health.HealthTitle))
 
-	query := `UPDATE alerts SET
-			last_updated=$1,
-			still_valid=$2,
-			latest_updates=$3,
-			risk_level=$4,
-			risk_details=$5
-			WHERE country_id=$6`
+	query := `UPDATE healths SET
+			health_link=$1,
+			health_content=$2,
+			last_updated=$3
+			WHERE health_title=$4`
 
 	_, err := s.db.Exec(
 		query,
-		&alert.LastUpdated,
-		&alert.StillValid,
-		&alert.LatestUpdates,
-		&alert.RiskLevel,
-		&alert.RiskDetails,
-		alert.CountryID,
+		&health.HealthLink,
+		&health.HealthContent,
+		time.Now(),
+		health.HealthTitle,
 	)
 	if err != nil {
-		return fmt.Errorf("unable to update alert: %v", err)
+		return fmt.Errorf("unable to update health: %v", err)
 	}
 
 	return nil
 }
 
-// AlertByCountryID finds a Alert by the countryID.
-func (s *Storage) AlertByCountryID(countryID int64) (*model.Alert, error) {
-	defer timer.ExecutionTime(time.Now(), fmt.Sprintf("[Storage:AlertByCountryID] countryID=%d", countryID))
+// HealthByTitle finds a Health by the health_title.
+func (s *Storage) HealthByTitle(healthTitle string) (*model.Health, error) {
+	defer timer.ExecutionTime(time.Now(), fmt.Sprintf("[Storage:HealthByTitle] healthTitle=%s", healthTitle))
 	query := `SELECT
-		id, last_updated, still_valid, latest_updates, risk_level, risk_details, country_id
-		FROM alerts
-		WHERE country_id = $1`
+		health_link, health_title, health_content, last_updated
+		FROM healths
+		WHERE health_title = $1`
 
-	alert := model.NewAlert()
-	err := s.db.QueryRow(query, countryID).Scan(
-		&alert.ID,
-		&alert.LastUpdated,
-		&alert.StillValid,
-		&alert.LatestUpdates,
-		&alert.RiskLevel,
-		&alert.RiskDetails,
-		&alert.CountryID,
+	return s.fetchHealth(query, healthTitle)
+}
+
+func (s *Storage) fetchHealth(query string, args ...interface{}) (*model.Health, error) {
+
+	health := model.NewHealth()
+	err := s.db.QueryRow(query, args...).Scan(
+		&health.HealthLink,
+		&health.HealthTitle,
+		&health.HealthContent,
+		&health.LastUpdated,
 	)
+
 	if err == sql.ErrNoRows {
 		return nil, nil
 	} else if err != nil {
-		return nil, fmt.Errorf("unable to fetch alert: %v", err)
+		return nil, fmt.Errorf("unable to fetch health: %v", err)
 	}
-	return alert, nil
+
+	return health, nil
 }
 
 //// RemoveHeadline deletes a headline.

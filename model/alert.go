@@ -16,15 +16,32 @@ type Alert struct {
 	LatestUpdates string    `json:"latest_updates"`
 	CountryID     int64     `json:"country_id"`
 	Risks         `json:"risks"`
-	Health        `json:"health"`
+}
+
+// HealthAlert represents a HealthAlert record in the system.
+type HealthAlert struct {
+	Date    time.Time `json:"health_date"`
+	Country `json:"country"`
+	Health  `json:"health"`
 }
 
 // Health represents a Health in the system.
 type Health struct {
+	ID            int64     `json:"-"`
 	HealthTitle   string    `json:"title"`
-	HealthDate    time.Time `json:"date"`
+	HealthLink    string    `json:"-"`
 	HealthContent string    `json:"content"`
+	LastUpdated   time.Time `json:"-"`
 }
+
+// Alerts represents a list of Alerts.
+type Alerts []*Alert
+
+// Healths represents a list of Health objects.
+type Healths []*Health
+
+// HealthAlerts represents a list of HealthAlert objects.
+type HealthAlerts []*HealthAlert
 
 // Risks represents a Risks in the system.
 type Risks struct {
@@ -37,5 +54,12 @@ func NewAlert() *Alert {
 	return &Alert{}
 }
 
-// Alerts represents a list of Alerts.
-type Alerts []*Alert
+// NewHealth returns a new Health.
+func NewHealth() *Health {
+	return &Health{}
+}
+
+// NewHealthAlert returns a new HealthAlert.
+func NewHealthAlert() *HealthAlert {
+	return &HealthAlert{}
+}
