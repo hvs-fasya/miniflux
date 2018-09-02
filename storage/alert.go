@@ -13,11 +13,10 @@ import (
 	"github.com/miniflux/miniflux/timer"
 )
 
-//
-//// NewHeadlinesQueryBuilder returns a new HeadlinesQueryBuilder
-//func (s *Storage) NewHeadlinesQueryBuilder() *HeadlinesQueryBuilder {
-//	return NewHeadlinesQueryBuilder(s)
-//}
+// NewSecurityQueryBuilder returns a new SecurityQueryBuilder
+func (s *Storage) NewSecurityQueryBuilder() *SecurityQueryBuilder {
+	return NewSecurityQueryBuilder(s)
+}
 
 // AlertExists checks if a alert exists by using the country_id.
 func (s *Storage) AlertExists(countryID int64) bool {
@@ -98,64 +97,3 @@ func (s *Storage) AlertByCountryID(countryID int64) (*model.Alert, error) {
 	}
 	return alert, nil
 }
-
-//// RemoveHeadline deletes a headline.
-//func (s *Storage) RemoveHeadline(headlineID int64) error {
-//	defer timer.ExecutionTime(time.Now(), fmt.Sprintf("[Storage:RemoveHeadline] headlineID=%d", headlineID))
-//
-//	result, err := s.db.Exec(`DELETE FROM headlines WHERE id = $1`, headlineID)
-//	if err != nil {
-//		return fmt.Errorf("unable to remove this headline: %v", err)
-//	}
-//
-//	count, err := result.RowsAffected()
-//	if err != nil {
-//		return fmt.Errorf("unable to remove this headline: %v", err)
-//	}
-//
-//	if count == 0 {
-//		return errors.New("nothing has been removed")
-//	}
-//
-//	return nil
-//}
-//
-//// Headlines returns all Headlines.
-//func (s *Storage) Headlines() (model.Headlines, error) {
-//	defer timer.ExecutionTime(time.Now(), "[Storage:Headlines]")
-//	query := `
-//		SELECT
-//			id, hash, published_at, title, content, url, country_id, visatype, category_id
-//		FROM headlines
-//		ORDER BY published_at ASC`
-//
-//	rows, err := s.db.Query(query)
-//	if err != nil {
-//		return nil, fmt.Errorf("unable to fetch headlines: %v", err)
-//	}
-//	defer rows.Close()
-//
-//	var headlines model.Headlines
-//	for rows.Next() {
-//		headline := model.NewHeadline()
-//		err := rows.Scan(
-//			&headline.ID,
-//			&headline.Hash,
-//			&headline.PublishedAt,
-//			&headline.Title,
-//			&headline.Content,
-//			&headline.Url,
-//			&headline.CountryID,
-//			&headline.VisaType,
-//			&headline.CategoryID,
-//		)
-//
-//		if err != nil {
-//			return nil, fmt.Errorf("unable to fetch headline row: %v", err)
-//		}
-//
-//		headlines = append(headlines, headline)
-//	}
-//
-//	return headlines, nil
-//}

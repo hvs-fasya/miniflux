@@ -7,6 +7,8 @@ package api
 import (
 	"errors"
 	"net/http"
+	"net/url"
+	"strings"
 	"time"
 
 	"github.com/miniflux/miniflux/http/context"
@@ -16,8 +18,6 @@ import (
 	"github.com/miniflux/miniflux/model"
 	"github.com/miniflux/miniflux/news"
 	"github.com/miniflux/miniflux/reader/icon"
-	"net/url"
-	"strings"
 )
 
 var (

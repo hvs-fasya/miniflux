@@ -114,6 +114,7 @@ func routes(cfg *config.Config, store *storage.Storage, feedHandler *feed.Handle
 	apiRouter.HandleFunc("/headlines", apiController.HeadlinesFull).Methods("GET")
 	apiRouter.HandleFunc("/countries", apiController.GetCountries).Methods("GET")
 	apiRouter.HandleFunc("/headlines/{headlineID}/icon", apiController.HeadlineIcon).Methods("GET")
+	apiRouter.HandleFunc("/alerts", apiController.AlertsFull).Methods("GET")
 
 	uiRouter := router.NewRoute().Subrouter()
 	uiRouter.Use(middleware.AppSession)
