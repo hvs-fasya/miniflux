@@ -43,16 +43,16 @@ func Task(store *storage.Storage) error {
 	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Println(len(countries))
-	//for _, country := range countries {
-	//	_, err = handler.handleAlert(country)
-	//	if err != nil {
-	//		logger.Debug("error: %s", err)
-	//		return err
-	//	}
-	//}
-	country, _ := store.CountryByName("Myanmar")
-	_, err = handler.handleAlert(country)
+	//fmt.Println(len(countries))
+	for _, country := range countries {
+		_, err = handler.handleAlert(country)
+		if err != nil {
+			logger.Debug("error: %s", err)
+			return err
+		}
+	}
+	//country, _ := store.CountryByName("Myanmar")
+	//_, err = handler.handleAlert(country)
 	return nil
 }
 
@@ -70,9 +70,6 @@ func (h *Handler) handleAlert(country *model.Country) (*model.Alert, error) {
 		scrapUrl = strings.Replace(scrapUrl, "(", "", -1)
 		scrapUrl = strings.Replace(scrapUrl, ")", "", -1)
 		scrapUrl = strings.Replace(scrapUrl, "-&-", "-", -1)
-	}
-	if countryName == "Saint Vincent & the Grenadines" {
-		fmt.Println(scrapUrl)
 	}
 	scrapUrl = ADVISORIES + scrapUrl
 
@@ -133,15 +130,18 @@ func (h *Handler) handleAlert(country *model.Country) (*model.Alert, error) {
 		return nil, err
 	}
 	logger.Debug("[Handler:UpdateAlert] Alert updated for countryID: %d", alert.CountryID)
-
-	healthTab := doc.Find("#health")
-	panel := healthTab.Find(".panel-body")
-	panel.Find("li").Each(func(i int, s *goquery.Selection) {
-		//todo: all links not only first
-		if i == 0 {
+	err = h.clearHealthAlertRecords(country)
+	if err != nil {
+		logger.Debug("[Handler:clearHealthAlertRecords] for country %s, error: %s", country.Name, err)
+	} else {
+		logger.Debug("[Handler:clearHealthAlertRecords] Health-Alert records cleared for country: %s", country.Name)
+		healthTab := doc.Find("#health")
+		panel := healthTab.Find(".panel-body")
+		panel.Find("li").Each(func(i int, s *goquery.Selection) {
 			healthLink := s.Find("a")
 			if healthLink.Text() != "" {
 				healthTitle := strings.Replace(healthLink.Text(), ": Advice for travellers", "", -1)
+				fmt.Println(healthTitle)
 				contentLink, _ := healthLink.Attr("href")
 				health, err := h.handleHealth(healthTitle, contentLink)
 				healthDate, e := time.Parse("January 02, 2006", strings.Replace(s.Text(), healthLink.Text()+" - ", "", -1))
@@ -151,15 +151,12 @@ func (h *Handler) handleAlert(country *model.Country) (*model.Alert, error) {
 						logger.Debug("error: %s", err)
 					}
 				}
-				err = h.handleHealthAlert(health, healthDate, countryName)
+				err = h.handleHealthAlert(health, healthDate, country)
 				if err != nil {
 					logger.Debug("error: %s", err)
 				}
 			}
-		}
-	})
-	if err != nil {
-		logger.Debug("error: %s", err)
+		})
 	}
 
 	return alert, nil
@@ -173,6 +170,7 @@ func (h *Handler) handleHealth(title string, link string) (*model.Health, error)
 		return nil, err
 	}
 	if existing != nil && time.Now().Sub(existing.LastUpdated) < time.Duration(1*time.Hour) {
+		fmt.Println("Return thus existing")
 		return existing, nil
 	}
 
@@ -190,12 +188,12 @@ func (h *Handler) handleHealth(title string, link string) (*model.Health, error)
 	}
 
 	if existing == nil {
-
-		err = h.store.CreateHealth(&health)
+		h, err := h.store.CreateHealth(&health)
 		if err != nil {
 			logger.Debug("error: %s", err)
 			return nil, err
 		}
+		health.ID = h.ID
 		logger.Debug("[Handler:CreateHealth] Health created for title: %s", health.HealthTitle)
 		return &health, nil
 	}
@@ -205,13 +203,31 @@ func (h *Handler) handleHealth(title string, link string) (*model.Health, error)
 		logger.Debug("error: %s", err)
 		return nil, err
 	}
+	health.ID = existing.ID
 	logger.Debug("[Handler:UpdateHealth] Health updated for title: %s", title)
 
 	return &health, nil
 }
 
-func (h *Handler) handleHealthAlert(health *model.Health, healthDate time.Time, countryName string) error {
-	logger.Debug("[Handler:handleHealthAlert] for health_title: %s, health_date: %s, country_name: %s", health.HealthTitle, healthDate, countryName)
-	//ha := &model.HealthAlert{}
+func (h *Handler) handleHealthAlert(health *model.Health, healthDate time.Time, country *model.Country) error {
+	logger.Debug("[Handler:handleHealthAlert] for health_title: %s, health_date: %s, country_name: %s", health.HealthTitle, healthDate, country.Name)
+
+	ha := &model.HealthAlert{
+		Health:  health,
+		Country: country,
+		Date:    healthDate,
+	}
+	err := h.store.CreateHealthAlert(ha)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (h *Handler) clearHealthAlertRecords(country *model.Country) error {
+	err := h.store.ClearHealthAlertsForCountry(country)
+	if err != nil {
+		return err
+	}
 	return nil
 }

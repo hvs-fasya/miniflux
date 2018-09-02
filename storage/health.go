@@ -29,20 +29,23 @@ func (s *Storage) HealthExists(healthTitle string) bool {
 }
 
 // CreateHealth creates a new Health.
-func (s *Storage) CreateHealth(health *model.Health) (err error) {
+func (s *Storage) CreateHealth(health *model.Health) (*model.Health, error) {
+	var err error
 	defer timer.ExecutionTime(time.Now(), fmt.Sprintf("[Storage:CreateHealth] health_title=%s", health.HealthTitle))
 
 	query := `INSERT INTO healths
 		(health_link, health_title, health_content, last_updated)
 		VALUES
-		($1, $2, $3, $4)`
+		($1, $2, $3, $4)
+		RETURNING id
+		`
 
-	_, err = s.db.Exec(query, health.HealthLink, health.HealthTitle, health.HealthContent, time.Now())
+	err = s.db.QueryRow(query, health.HealthLink, health.HealthTitle, health.HealthContent, time.Now()).Scan(&health.ID)
 	if err != nil {
-		return fmt.Errorf("unable to create health: %v", err)
+		return health, fmt.Errorf("unable to create health: %v", err)
 	}
 
-	return nil
+	return health, nil
 }
 
 // UpdateHealth updates a Health.
@@ -73,7 +76,7 @@ func (s *Storage) UpdateHealth(health *model.Health) error {
 func (s *Storage) HealthByTitle(healthTitle string) (*model.Health, error) {
 	defer timer.ExecutionTime(time.Now(), fmt.Sprintf("[Storage:HealthByTitle] healthTitle=%s", healthTitle))
 	query := `SELECT
-		health_link, health_title, health_content, last_updated
+		id, health_link, health_title, health_content, last_updated
 		FROM healths
 		WHERE health_title = $1`
 
@@ -84,6 +87,7 @@ func (s *Storage) fetchHealth(query string, args ...interface{}) (*model.Health,
 
 	health := model.NewHealth()
 	err := s.db.QueryRow(query, args...).Scan(
+		&health.ID,
 		&health.HealthLink,
 		&health.HealthTitle,
 		&health.HealthContent,

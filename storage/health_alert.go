@@ -20,7 +20,7 @@ import (
 
 // CreateHealthAlert creates a new Health-Alert record.
 func (s *Storage) CreateHealthAlert(ha *model.HealthAlert) (err error) {
-	defer timer.ExecutionTime(time.Now(), fmt.Sprintf("[Storage:CreateHealthAlert] health_title=%s country_id=%d", ha.HealthTitle, ha.Country.ID))
+	defer timer.ExecutionTime(time.Now(), fmt.Sprintf("[Storage:CreateHealthAlert] health_title=%s country_name=%s", ha.Health.HealthTitle, ha.Country.Name))
 
 	query := `INSERT INTO alert_health
 		(country_id, health_id, alert_health_date)
@@ -37,7 +37,7 @@ func (s *Storage) CreateHealthAlert(ha *model.HealthAlert) (err error) {
 
 // UpdateHealthAlert updates a HealthAlert record.
 func (s *Storage) UpdateHealthAlert(ha *model.HealthAlert) error {
-	defer timer.ExecutionTime(time.Now(), fmt.Sprintf("[Storage:UpdateHealthAlert] health_title=%s", ha.HealthTitle))
+	defer timer.ExecutionTime(time.Now(), fmt.Sprintf("[Storage:UpdateHealthAlert] health_title=%s", ha.Health.HealthTitle))
 
 	query := `UPDATE alert_health SET
 			date=$1
@@ -105,11 +105,27 @@ func (s *Storage) HealthAlertsByCountryNameWithHealth(countryName string) (model
 	healthAlerts := make(model.HealthAlerts, 0)
 	for rows.Next() {
 		var ha model.HealthAlert
-		if err := rows.Scan(&ha.Health.ID, &ha.Country.ID, &ha.Date, &ha.Name, &ha.Alpha3, &ha.HealthTitle, &ha.HealthLink, &ha.HealthContent); err != nil {
+		if err := rows.Scan(&ha.Health.ID, &ha.Country.ID, &ha.Date, &ha.Country.Name, &ha.Country.Alpha3, &ha.Health.HealthTitle, &ha.Health.HealthLink, &ha.Health.HealthContent); err != nil {
 			return nil, fmt.Errorf("Unable to fetch health_alert with health row: %v", err)
 		}
 		healthAlerts = append(healthAlerts, &ha)
 	}
 
 	return healthAlerts, nil
+}
+
+// ClearHealthAlertsForCountry removes HealthAlert records for country.
+func (s *Storage) ClearHealthAlertsForCountry(country *model.Country) (err error) {
+	defer timer.ExecutionTime(time.Now(), fmt.Sprintf("[Storage:ClearHealthAlertsForCountry] for country_name=%s", country.Name))
+
+	query := `DELETE FROM alert_health ah
+		WHERE country_id IN 
+		(SELECT id FROM countries WHERE name = $1)`
+
+	_, err = s.db.Exec(query, country.Name)
+	if err != nil {
+		return fmt.Errorf("unable to clear health_alert records: %v", err)
+	}
+
+	return nil
 }

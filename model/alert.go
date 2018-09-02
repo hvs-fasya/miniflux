@@ -21,8 +21,8 @@ type Alert struct {
 // HealthAlert represents a HealthAlert record in the system.
 type HealthAlert struct {
 	Date    time.Time `json:"health_date"`
-	Country `json:"country"`
-	Health  `json:"health"`
+	Country *Country  `json:"country"`
+	Health  *Health   `json:"health"`
 }
 
 // Health represents a Health in the system.
