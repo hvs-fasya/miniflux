@@ -37,6 +37,12 @@ type Entry struct {
 	Category    *Category     `json:"category,omitempty"`
 }
 
+//EntryWithIcon feed item with icon data
+type EntryWithIcon struct {
+	Entry
+	EntryIcon *Icon
+}
+
 // Entries represents a list of entries.
 type Entries []*Entry
 

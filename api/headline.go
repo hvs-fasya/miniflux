@@ -154,6 +154,7 @@ func (c *Controller) HeadlinesFull(w http.ResponseWriter, r *http.Request) {
 	visaType := request.QueryParam(r, "visatype", "")
 	countryName := request.QueryParam(r, "country", "")
 	from := request.QueryParam(r, "from", "")
+	to := request.QueryParam(r, "to", "")
 	var country *model.Country
 	var err error
 	if countryName != "" {
@@ -201,7 +202,15 @@ func (c *Controller) HeadlinesFull(w http.ResponseWriter, r *http.Request) {
 	}
 	officialBuilder.After(&startDate)
 
-	officialEntries, err := officialBuilder.GetEntries()
+	var endDate time.Time
+	if to != "" {
+		endDate, _ = time.Parse("2006-01-02", to)
+	} else {
+		endDate = time.Now()
+	}
+	officialBuilder.Before(&endDate)
+
+	officialEntries, err := officialBuilder.GetEntriesWithIcons()
 	if err != nil {
 		json.ServerError(w, errors.New("Unable to fetch official entries"))
 		return
@@ -213,10 +222,6 @@ func (c *Controller) HeadlinesFull(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for _, e := range officialEntries {
-		var fIcon *model.Icon
-		if c.store.HasIcon(e.Feed.ID) {
-			fIcon, _ = c.store.IconByID(e.Feed.Icon.IconID)
-		}
 
 		var entryUrl = e.URL
 		if strings.Contains(e.URL, `https://www.google.com/url?`) {
@@ -231,11 +236,11 @@ func (c *Controller) HeadlinesFull(w http.ResponseWriter, r *http.Request) {
 			PublishedAt:  e.Date,
 			CategoryName: e.Feed.Category.Title,
 		}
-		if fIcon != nil {
+		if e.EntryIcon.ID != 0 {
 			of.Icon = &feedIcon{
-				ID:       fIcon.ID,
-				MimeType: fIcon.MimeType,
-				Data:     fIcon.DataURL(),
+				ID:       e.EntryIcon.ID,
+				MimeType: e.EntryIcon.MimeType,
+				Data:     e.EntryIcon.DataURL(),
 			}
 		}
 		officials = append(officials, of)
@@ -256,18 +261,15 @@ func (c *Controller) HeadlinesFull(w http.ResponseWriter, r *http.Request) {
 	}
 
 	mediaBuilder.After(&startDate)
+	mediaBuilder.Before(&endDate)
 
-	mediaEntries, err := mediaBuilder.GetEntries()
+	mediaEntries, err := mediaBuilder.GetEntriesWithIcons()
 	if err != nil {
 		json.ServerError(w, errors.New("Unable to fetch media entries"))
 		return
 	}
 	var medias = []EntryOutput{}
 	for _, e := range mediaEntries {
-		var fIcon *model.Icon
-		if c.store.HasIcon(e.Feed.ID) {
-			fIcon, _ = c.store.IconByID(e.Feed.Icon.IconID)
-		}
 
 		var entryUrl = e.URL
 		if strings.Contains(e.URL, `https://www.google.com/url?`) {
@@ -275,21 +277,21 @@ func (c *Controller) HeadlinesFull(w http.ResponseWriter, r *http.Request) {
 			entryUrl = u.Query().Get("url")
 		}
 
-		of := EntryOutput{
+		m := EntryOutput{
 			Title:        e.Title,
 			Content:      e.Content,
 			Url:          entryUrl,
 			PublishedAt:  e.Date,
 			CategoryName: e.Feed.Category.Title,
 		}
-		if fIcon != nil {
-			of.Icon = &feedIcon{
-				ID:       fIcon.ID,
-				MimeType: fIcon.MimeType,
-				Data:     fIcon.DataURL(),
+		if e.EntryIcon.ID != 0 {
+			m.Icon = &feedIcon{
+				ID:       e.EntryIcon.ID,
+				MimeType: e.EntryIcon.MimeType,
+				Data:     e.EntryIcon.DataURL(),
 			}
 		}
-		medias = append(medias, of)
+		medias = append(medias, m)
 	}
 
 	//headlines
@@ -304,8 +306,9 @@ func (c *Controller) HeadlinesFull(w http.ResponseWriter, r *http.Request) {
 	}
 
 	headlinesBuilder.After(&startDate)
+	headlinesBuilder.Before(&endDate)
 
-	headlines, err := headlinesBuilder.GetHeadlines()
+	headlines, err := headlinesBuilder.GetHeadlinesWithIcons()
 	if err != nil {
 		json.ServerError(w, errors.New("Unable to fetch headlines"))
 		return
@@ -322,15 +325,11 @@ func (c *Controller) HeadlinesFull(w http.ResponseWriter, r *http.Request) {
 			CategoryName: e.Category.Title,
 			VisaType:     e.VisaType,
 		}
-		var fIcon *model.Icon
-		if e.IconID.Valid {
-			fIcon, _ = c.store.IconByID(e.IconID.Int64)
-		}
-		if fIcon != nil {
+		if e.Icon.ID != 0 {
 			h.Icon = &feedIcon{
-				ID:       fIcon.ID,
-				MimeType: fIcon.MimeType,
-				Data:     fIcon.DataURL(),
+				ID:       e.Icon.ID,
+				MimeType: e.Icon.MimeType,
+				Data:     e.Icon.DataURL(),
 			}
 		}
 		hlines = append(hlines, h)

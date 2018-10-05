@@ -5,6 +5,7 @@
 package storage
 
 import (
+	"database/sql"
 	"fmt"
 	"strings"
 	"time"
@@ -241,6 +242,98 @@ func (e *HeadlinesOfficialEntryQueryBuilder) GetEntries() (model.Entries, error)
 
 		entry.Feed.ID = entry.FeedID
 		entry.Feed.Icon.FeedID = entry.FeedID
+		entries = append(entries, &entry)
+	}
+
+	return entries, nil
+}
+
+// GetEntries returns a list of entries that match the condition.
+func (e *HeadlinesOfficialEntryQueryBuilder) GetEntriesWithIcons() ([]*model.EntryWithIcon, error) {
+	debugStr := "[HeadlinesOfficialEntryQueryBuilder:GetEntriesWithIcons] feedID=%d, categoryID=%d, status=%s, order=%s, direction=%s, filter=%s"
+	defer timer.ExecutionTime(time.Now(), fmt.Sprintf(debugStr, e.feedID, e.categoryID, e.status, e.order, e.direction, e.filter))
+
+	query := `
+		SELECT
+		e.id, e.feed_id, e.hash, e.published_at, e.title,
+		e.url, e.comments_url, e.author, e.content, e.status,
+		f.title as feed_title, f.feed_url, f.site_url, f.checked_at,
+		f.category_id, c.title as category_title, f.scraper_rules, f.rewrite_rules, f.crawler,
+		i.id, i.mime_type, i.content
+		FROM entries e
+		LEFT JOIN feeds f ON f.id=e.feed_id
+		LEFT JOIN categories c ON c.id=f.category_id
+		LEFT JOIN feed_icons fi ON fi.feed_id=f.id
+		LEFT JOIN icons i ON fi.icon_id=i.id
+		WHERE %s %s
+	`
+
+	args, conditions := e.buildCondition()
+	query = fmt.Sprintf(query, conditions, e.buildSorting())
+
+	rows, err := e.store.db.Query(query, args...)
+	if err != nil {
+		return nil, fmt.Errorf("unable to get entries: %v", err)
+	}
+	defer rows.Close()
+
+	entries := make([]*model.EntryWithIcon, 0)
+	for rows.Next() {
+		var entry model.EntryWithIcon
+		var tz string
+		var icon = struct {
+			ID       sql.NullInt64
+			MimeType sql.NullString
+			Content  []byte
+		}{}
+
+		entry.Feed = &model.Feed{}
+		entry.Feed.Category = &model.Category{}
+
+		err := rows.Scan(
+			&entry.ID,
+			&entry.FeedID,
+			&entry.Hash,
+			&entry.Date,
+			&entry.Title,
+			&entry.URL,
+			&entry.CommentsURL,
+			&entry.Author,
+			&entry.Content,
+			&entry.Status,
+			//&entry.Starred,
+			&entry.Feed.Title,
+			&entry.Feed.FeedURL,
+			&entry.Feed.SiteURL,
+			&entry.Feed.CheckedAt,
+			&entry.Feed.Category.ID,
+			&entry.Feed.Category.Title,
+			&entry.Feed.ScraperRules,
+			&entry.Feed.RewriteRules,
+			&entry.Feed.Crawler,
+			&icon.ID,
+			&icon.MimeType,
+			&icon.Content,
+		)
+
+		if err != nil {
+			return nil, fmt.Errorf("unable to fetch entry row: %v", err)
+		}
+
+		entry.EntryIcon = &model.Icon{}
+		if icon.ID.Valid {
+			entry.EntryIcon.ID = icon.ID.Int64
+			entry.EntryIcon.MimeType = icon.MimeType.String
+			entry.EntryIcon.Content = icon.Content
+		} else {
+			entry.EntryIcon.ID = 0
+		}
+
+		// Make sure that timestamp fields contains timezone information (API)
+		entry.Date = timezone.Convert(tz, entry.Date)
+		entry.Feed.CheckedAt = timezone.Convert(tz, entry.Feed.CheckedAt)
+
+		entry.Feed.ID = entry.FeedID
 		entries = append(entries, &entry)
 	}
 

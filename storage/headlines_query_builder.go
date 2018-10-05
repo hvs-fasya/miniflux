@@ -11,6 +11,7 @@ import (
 
 	"github.com/lib/pq"
 
+	"database/sql"
 	"github.com/miniflux/miniflux/model"
 	"github.com/miniflux/miniflux/timer"
 )
@@ -123,12 +124,14 @@ func (e *HeadlinesQueryBuilder) GetHeadlines() (model.Headlines, error) {
 		SELECT
 		e.id, e.hash, e.published_at, e.title,
 		e.url, e.content,
-		e.category_id, e.country_id, e.visatype, e.icon_id,
+		e.category_id, e.country_id, e.visatype,
 		c.title as category_title,
-		co.name as country_title
+		co.name as country_title,
+		i.id, i.mime_type, i.content
 		FROM headlines e
 		LEFT JOIN categories c ON c.id=e.category_id
 		LEFT JOIN countries co ON co.id=e.country_id
+		LEFT JOIN icons i ON i.id=e.icon_id
 		WHERE %s %s
 	`
 
@@ -149,6 +152,7 @@ func (e *HeadlinesQueryBuilder) GetHeadlines() (model.Headlines, error) {
 
 		headline.Category = &model.Category{}
 		headline.Country = &model.Country{}
+		headline.Icon = &model.Icon{}
 
 		err := rows.Scan(
 			&headline.ID,
@@ -160,14 +164,92 @@ func (e *HeadlinesQueryBuilder) GetHeadlines() (model.Headlines, error) {
 			&headline.CategoryID,
 			&headline.CountryID,
 			&headline.VisaType,
-			&headline.IconID,
 			&headline.Category.Title,
 			&headline.Country.Name,
+			&headline.Icon.ID,
+			&headline.Icon.MimeType,
+			&headline.Icon.Content,
 		)
 
 		if err != nil {
-			fmt.Println(err)
 			return nil, fmt.Errorf("unable to fetch headline row: %v", err)
+		}
+
+		headlines = append(headlines, &headline)
+	}
+
+	return headlines, nil
+}
+
+// GetHeadlinesWithIcons returns a list of entries that match the condition.
+func (e *HeadlinesQueryBuilder) GetHeadlinesWithIcons() (model.Headlines, error) {
+	debugStr := "[HeadlinesQueryBuilder:GetHeadlinesWithIcons] category_id=%d, country_id=%d, order=%s, direction=%s, visatype=%s"
+	defer timer.ExecutionTime(time.Now(), fmt.Sprintf(debugStr, e.categoryID, e.countryID, e.order, e.direction, e.visatype))
+
+	query := `
+		SELECT
+		e.id, e.hash, e.published_at, e.title,
+		e.url, e.content,
+		e.category_id, e.country_id, e.visatype,
+		c.title as category_title,
+		co.name as country_title,
+		i.id, i.mime_type, i.content
+		FROM headlines e
+		LEFT JOIN categories c ON c.id=e.category_id
+		LEFT JOIN countries co ON co.id=e.country_id
+		LEFT JOIN icons i ON i.id=e.icon_id
+		WHERE %s %s
+	`
+
+	args, conditions := e.buildCondition()
+	query = fmt.Sprintf(query, conditions, e.buildSorting())
+
+	rows, err := e.store.db.Query(query, args...)
+	if err != nil {
+		return nil, fmt.Errorf("unable to get headlines: %v", err)
+	}
+	defer rows.Close()
+
+	headlines := make(model.Headlines, 0)
+	for rows.Next() {
+		var headline model.Headline
+
+		headline.Category = &model.Category{}
+		headline.Country = &model.Country{}
+		headline.Icon = &model.Icon{}
+		icon := struct {
+			ID       sql.NullInt64
+			MimeType sql.NullString
+			Content  []byte
+		}{}
+
+		err := rows.Scan(
+			&headline.ID,
+			&headline.Hash,
+			&headline.PublishedAt,
+			&headline.Title,
+			&headline.Url,
+			&headline.Content,
+			&headline.CategoryID,
+			&headline.CountryID,
+			&headline.VisaType,
+			&headline.Category.Title,
+			&headline.Country.Name,
+			&icon.ID,
+			&icon.MimeType,
+			&icon.Content,
+		)
+
+		if err != nil {
+			return nil, fmt.Errorf("unable to fetch headline row: %v", err)
+		}
+
+		if icon.ID.Valid {
+			headline.Icon.ID = icon.ID.Int64
+			headline.Icon.MimeType = icon.MimeType.String
+			headline.Icon.Content = icon.Content
+		} else {
+			headline.Icon.ID = 0
 		}
 
 		headlines = append(headlines, &headline)
