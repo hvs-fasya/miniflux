@@ -1,21 +1,31 @@
 version: '3'
 services:
   miniflux:
-#    image: "754371823479.dkr.ecr.us-west-2.amazonaws.com/visadb-news"
     image: visadb-news:latest
+#    image: miniflux/miniflux:2.0.7
+    volumes:
+      -  /etc/letsencrypt:/etc/letsencrypt
+#      -  /etc/letsencrypt/archive:/etc/letsencrypt/archive
+      - /tmp/cert_cache:/tmp/cert_cache
     ports:
       - "80:8080"
-      - "443:443"
+      - "443:8081"
     depends_on:
       - db
     environment:
       - DATABASE_URL=postgres://miniflux:miniflux@db/miniflux?sslmode=disable
-      - RUN_MIGRATIONS=1
-      - CREATE_ADMIN=1
-      - ADMIN_USERNAME=admin
-      - ADMIN_PASSWORD=12345678
+      - CERT_FILE=/etc/letsencrypt/live/newsapi.visadb.io/fullchain.pem
+      - KEY_FILE=/etc/letsencrypt/live/newsapi.visadb.io/privkey.pem
+      - :8081
+#      - CERT_DOMAIN=newsapi.visadb.io
+#      - RUN_MIGRATIONS=1
+#      - CREATE_ADMIN=1
+#      - ADMIN_USERNAME=admin
+#      - ADMIN_PASSWORD=12345678
   db:
     image: postgres:10.1
+    volumes:
+      - /postgresql/data:/var/lib/postgresql/data
     environment:
       - POSTGRES_USER=miniflux
       - POSTGRES_PASSWORD=miniflux
